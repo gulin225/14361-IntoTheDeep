@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Autonomous.AutonomousTesting;
 
 import static org.firstinspires.ftc.teamcode.Autonomous.AutonomousTesting.AutoStates.idle;
+import static org.firstinspires.ftc.teamcode.Autonomous.AutonomousTesting.AutoStates.preload;
 import static org.firstinspires.ftc.teamcode.Autonomous.AutonomousTesting.AutoStates.samples;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -12,9 +13,13 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.Autonomous.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Limelight;
+
+import java.util.ArrayList;
 
 //-72 y = red side
 //x is pos on red side
@@ -22,19 +27,23 @@ import org.firstinspires.ftc.teamcode.Subsystems.Limelight;
 @Autonomous(name = "RedSpecimenPoukie", group = "Autonomous")
 public class RedSpecimenPoukie extends LinearOpMode {
 
-    AutoStates autoStates = idle;
-    AutoActions actions;
+    AutoStates autoStates = preload;
+    IMU imu;
     MecanumDrive drive;
     Pose2d currentPose = new Pose2d(18,-63.5, Math.toRadians(90));
     TelemetryPacket tel = new TelemetryPacket();
     SequentialAction sampleAction;
     ParallelAction preloadAction;
     Limelight limelight;
+    final double cameraPlacementX = 0;
+    final double cameraPlacementY = 0;
+    final double cameraAngle = Math.atan(cameraPlacementY/cameraPlacementX);
+    final double botCenterHypotenuse = Math.sqrt(Math.pow(cameraPlacementX,2) + Math.pow(cameraPlacementY,2));
     @Override
     public void runOpMode() throws InterruptedException {
         drive = new MecanumDrive(hardwareMap, currentPose);
-        actions = new AutoActions(drive,currentPose);
         limelight = new Limelight(hardwareMap, telemetry);
+        imu = drive.lazyImu.get();
 
         while(!isStopRequested() && !opModeIsActive()) {
         }
@@ -43,8 +52,12 @@ public class RedSpecimenPoukie extends LinearOpMode {
 
         if (isStopRequested()) return;
 
-        preloadAction = createPreloadAction();
-        Actions.runBlocking(preloadAction);
+        autoStates = idle;
+        if (autoStates == idle) {}
+        else {
+            preloadAction = createPreloadAction();
+            Actions.runBlocking(preloadAction);
+        }
 
         while (!isStopRequested() && opModeIsActive()) {
             switch (autoStates){
@@ -70,10 +83,31 @@ public class RedSpecimenPoukie extends LinearOpMode {
     }
 
     public Pose2d updatePoseWithAprilTag(){
-        telemetry.addData("Limelight pos", limelight.getLatestPosition().get(0) + ' ' + limelight.getLatestPosition().get(1));
+        double heading = imu.getRobotYawPitchRollAngles().getYaw();
+        limelight.limelight.updateRobotOrientation(heading);
+        Pose3D botpose = limelight.getLatestPosition();
+        telemetry.addData("Heading", heading);
+
+        if (botpose != null){
+            double cameraX = (Math.abs(botpose.getPosition().x*39.37)-70.562)/1.62;
+            double cameraY = (botpose.getPosition().y*39.37-46.5)/1.65;
+            telemetry.addData("Camera X", cameraX);
+            telemetry.addData("Camera Y",  cameraY);
+
+            //if camera is centered
+            double relativeBotX = Math.cos(Math.toRadians(heading))*cameraPlacementX + cameraX;
+            double relativeBotY = Math.sin(Math.toRadians(heading))*cameraPlacementX + cameraX;
+
+            //if camera has y displacement from origin
+            relativeBotX = Math.cos(Math.toRadians(heading) + cameraAngle) * botCenterHypotenuse;
+            relativeBotY = Math.sin(Math.toRadians(heading) + cameraAngle) * botCenterHypotenuse;
+
+            double absoluteBotX = relativeBotX + cameraX;
+            double absoluteBotY = relativeBotY + cameraY;
+        }
+
         telemetry.update();
         return null;
-       // return Pose2d;
     }
     public ParallelAction createPreloadAction(){
             ParallelAction preloadAction = new ParallelAction(drive.actionBuilder(currentPose)
