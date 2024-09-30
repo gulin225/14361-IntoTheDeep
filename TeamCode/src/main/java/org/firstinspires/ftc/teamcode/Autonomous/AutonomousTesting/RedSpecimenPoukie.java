@@ -15,6 +15,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.Autonomous.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Limelight;
@@ -35,7 +36,8 @@ public class RedSpecimenPoukie extends LinearOpMode {
     SequentialAction sampleAction;
     ParallelAction preloadAction;
     Limelight limelight;
-    final double cameraPlacementX = 0;
+    final Vector2d targetAprilTag = new Vector2d(71.5,-47.5);
+    final double cameraPlacementX = 7.5;
     final double cameraPlacementY = 0;
     final double cameraAngle = Math.atan(cameraPlacementY/cameraPlacementX);
     final double botCenterHypotenuse = Math.sqrt(Math.pow(cameraPlacementX,2) + Math.pow(cameraPlacementY,2));
@@ -90,7 +92,7 @@ public class RedSpecimenPoukie extends LinearOpMode {
 
         if (botpose != null){
             double cameraX = (Math.abs(botpose.getPosition().x*39.37)-70.562)/1.62;
-            double cameraY = (botpose.getPosition().y*39.37-46.5)/1.65;
+            double cameraY = -10 + (((botpose.getPosition().y*39.37)-1)+75.0458)/1.444;
             telemetry.addData("Camera X", cameraX);
             telemetry.addData("Camera Y",  cameraY);
 
@@ -101,6 +103,8 @@ public class RedSpecimenPoukie extends LinearOpMode {
             //if camera has y displacement from origin
             relativeBotX = Math.cos(Math.toRadians(heading) + cameraAngle) * botCenterHypotenuse;
             relativeBotY = Math.sin(Math.toRadians(heading) + cameraAngle) * botCenterHypotenuse;
+            telemetry.addData("Relative X", relativeBotX);
+            telemetry.addData("Relative Y",  relativeBotY);
 
             double absoluteBotX = relativeBotX + cameraX;
             double absoluteBotY = relativeBotY + cameraY;

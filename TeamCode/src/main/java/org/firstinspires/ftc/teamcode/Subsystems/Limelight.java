@@ -26,6 +26,7 @@ public class Limelight {
 
     public Pose3D getLatestPosition(){
         LLResult result = limelight.getLatestResult();
+
         Pose3D botpose = result.getBotpose_MT2();
         return botpose;
     }
