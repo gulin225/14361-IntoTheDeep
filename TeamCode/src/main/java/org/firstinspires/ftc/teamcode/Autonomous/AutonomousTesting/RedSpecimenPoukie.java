@@ -95,8 +95,8 @@ public class RedSpecimenPoukie extends LinearOpMode {
             telemetry.addData("Camera Y",  cameraY);
 
             //if camera is centered
-            double relativeBotX = Math.cos(Math.toRadians(heading))*cameraPlacementX + cameraX;
-            double relativeBotY = Math.sin(Math.toRadians(heading))*cameraPlacementX + cameraX;
+            double relativeBotX = Math.cos(Math.toRadians(heading))*cameraPlacementX;
+            double relativeBotY = Math.sin(Math.toRadians(heading))*cameraPlacementX;
 
             //if camera has y displacement from origin
             relativeBotX = Math.cos(Math.toRadians(heading) + cameraAngle) * botCenterHypotenuse;
