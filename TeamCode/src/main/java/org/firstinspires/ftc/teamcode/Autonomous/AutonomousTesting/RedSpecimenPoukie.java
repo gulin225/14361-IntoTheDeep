@@ -4,8 +4,11 @@ import static org.firstinspires.ftc.teamcode.Autonomous.AutonomousTesting.AutoSt
 import static org.firstinspires.ftc.teamcode.Autonomous.AutonomousTesting.AutoStates.preload;
 import static org.firstinspires.ftc.teamcode.Autonomous.AutonomousTesting.AutoStates.samples;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -54,7 +57,7 @@ public class RedSpecimenPoukie extends LinearOpMode {
 
         if (isStopRequested()) return;
 
-        autoStates = preload;
+        autoStates = idle;
         if (autoStates == idle) {}
         else {
             preloadAction = createPreloadAction();
@@ -80,52 +83,20 @@ public class RedSpecimenPoukie extends LinearOpMode {
                 case idle:
                     break;
             }
-
             Pose2d updatedPose = updatePoseWithAprilTag();
-            if(updatedPose != null) {
+            if (updatedPose != null) {
                 //drive.pose = updatedPose;
-                telemetry.addData("LL Location", "x: "+ updatedPose.position.x + " Y: " + updatedPose.position.y);
-            }
-            else telemetry.addLine("April tag not in sight");
-            telemetry.addData("RR Location", "x: "+ drive.pose.position.x + " Y: " + drive.pose.position.y);
-
-
+                telemetry.addData("LL Location", "x: " + updatedPose.position.x + " Y: " + updatedPose.position.y);
+            } else telemetry.addLine("April tag not in sight");
+            telemetry.addData("RR Location", "x: " + drive.pose.position.x + " Y: " + drive.pose.position.y);
             telemetry.update();
         }
     }
 
-    public Pose2d updatePoseWithAprilTag(){
-        double heading = imu.getRobotYawPitchRollAngles().getYaw();
-        limelight.limelight.updateRobotOrientation(heading);
-        Pose3D botpose = limelight.getLatestPosition();
-        telemetry.addData("Heading", heading);
-        Pose2d newPose = null;
-        if (botpose != null){
-            double cameraX = (Math.abs(botpose.getPosition().x*39.37)-70.562)/1.62;
-            double cameraY = ((botpose.getPosition().y*39.37)+ 47.3044)/1.65203;
 
-            //if camera is centered
-            double relativeBotX = Math.cos(Math.toRadians(heading))*cameraPlacementX;
-            double relativeBotY = Math.sin(Math.toRadians(heading))*cameraPlacementX;
-
-            //if camera has y displacement from origin
-            relativeBotX = Math.cos(Math.toRadians(heading) + cameraAngle) * botCenterHypotenuse;
-            relativeBotY = Math.sin(Math.toRadians(heading) + cameraAngle) * botCenterHypotenuse;
-
-            double absoluteBotX = cameraX - relativeBotX;
-            double absoluteBotY = cameraY - relativeBotY;
-
-            double botPosX = targetAprilTag.x + absoluteBotX;
-            double botPosY = targetAprilTag.y + absoluteBotY;
-            telemetry.addData("Bot X", botPosX);
-            telemetry.addData("Bot Y",  botPosY);
-            newPose = new Pose2d(botPosX, botPosY, heading);
-        }
-        return newPose;
-    }
     public ParallelAction createPreloadAction(){
             ParallelAction preloadAction = new ParallelAction(drive.actionBuilder(drive.pose)
-                    .splineToConstantHeading(new Vector2d(18,-33), Math.toRadians(0))
+                    .splineToConstantHeading(new Vector2d(18,-45), Math.toRadians(0))
                     .waitSeconds(2).build()
             );
 
@@ -155,6 +126,43 @@ public class RedSpecimenPoukie extends LinearOpMode {
 
         SequentialAction specimenSequence = new SequentialAction(sample1Action, sample2Action, sample3Action);
         return specimenSequence;
+    }
+
+    public class telemetryAction implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            return true;
+        }
+    }
+
+    public Pose2d updatePoseWithAprilTag(){
+        double heading = imu.getRobotYawPitchRollAngles().getYaw();
+        limelight.limelight.updateRobotOrientation(heading);
+        Pose3D botpose = limelight.getLatestPosition();
+        telemetry.addData("Heading", heading);
+        Pose2d newPose = null;
+        if (botpose != null){
+            double cameraX = 1.8002 - 0.04203*(botpose.getPosition().x);
+            double cameraY = ((botpose.getPosition().y*39.37)+ 47.3044)/1.65203;
+
+            //if camera is centered
+            double relativeBotX = Math.cos(Math.toRadians(heading))*cameraPlacementX;
+            double relativeBotY = Math.sin(Math.toRadians(heading))*cameraPlacementX;
+
+            //if camera has y displacement from origin
+            relativeBotX = Math.cos(Math.toRadians(heading) + cameraAngle) * botCenterHypotenuse;
+            relativeBotY = Math.sin(Math.toRadians(heading) + cameraAngle) * botCenterHypotenuse;
+
+            double absoluteBotX = cameraX - relativeBotX;
+            double absoluteBotY = cameraY - relativeBotY;
+
+            double botPosX = targetAprilTag.x + absoluteBotX;
+            double botPosY = targetAprilTag.y + absoluteBotY;
+            telemetry.addData("Cam X", cameraX);
+            telemetry.addData("Cam Y",  cameraY);
+            newPose = new Pose2d(botPosX, botPosY, heading);
+        }
+        return newPose;
     }
 }
 
