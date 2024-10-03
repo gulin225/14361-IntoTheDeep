@@ -39,6 +39,7 @@ public class RedSpecimenPoukie extends LinearOpMode {
     SequentialAction sampleAction;
     ParallelAction preloadAction;
     Limelight limelight;
+    boolean running;
     final Vector2d targetAprilTag = new Vector2d(71.5,-47.5);
     final double cameraPlacementX = 7.5;
     final double cameraPlacementY = 0;
@@ -57,25 +58,26 @@ public class RedSpecimenPoukie extends LinearOpMode {
 
         if (isStopRequested()) return;
 
-        autoStates = idle;
+        autoStates = preload;
         if (autoStates == idle) {}
         else {
             preloadAction = createPreloadAction();
-            Actions.runBlocking(preloadAction);
+            running = preloadAction.run(tel);
         }
 
         while (!isStopRequested() && opModeIsActive()) {
             switch (autoStates){
                 case preload:
-                    if (!preloadAction.run(tel)) {
-                        //sampleAction = createSampleAction();
-                        //Actions.runBlocking(sampleAction);
-                        //autoStates = samples;
-                        autoStates = idle;
+                    running = preloadAction.run(tel);
+                    if (!running) {
+                        sampleAction = createSampleAction();
+                        running = sampleAction.run(tel);
+                        autoStates = samples;
                     }
                     break;
                 case samples:
-                    if (!sampleAction.run(tel)) {
+                    running = sampleAction.run(tel);
+                    if (!running) {
 
                         autoStates = idle;
                     }
@@ -138,11 +140,11 @@ public class RedSpecimenPoukie extends LinearOpMode {
     public Pose2d updatePoseWithAprilTag(){
         double heading = imu.getRobotYawPitchRollAngles().getYaw();
         limelight.limelight.updateRobotOrientation(heading);
-        Pose3D botpose = limelight.getLatestPosition();
+        Pose3D botpose = limelight.getLatestPosition(telemetry);
         telemetry.addData("Heading", heading);
         Pose2d newPose = null;
         if (botpose != null){
-            double cameraX = 1.8002 - 0.04203*(botpose.getPosition().x);
+            double cameraX = (botpose.getPosition().x-1.8002)/0.04203;
             double cameraY = ((botpose.getPosition().y*39.37)+ 47.3044)/1.65203;
 
             //if camera is centered
@@ -158,8 +160,9 @@ public class RedSpecimenPoukie extends LinearOpMode {
 
             double botPosX = targetAprilTag.x + absoluteBotX;
             double botPosY = targetAprilTag.y + absoluteBotY;
+
             telemetry.addData("Cam X", cameraX);
-            telemetry.addData("Cam Y",  cameraY);
+            telemetry.addData("Cam Y", cameraY);
             newPose = new Pose2d(botPosX, botPosY, heading);
         }
         return newPose;

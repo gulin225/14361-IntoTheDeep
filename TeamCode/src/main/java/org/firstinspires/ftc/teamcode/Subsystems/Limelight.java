@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Limelight {
     public Limelight3A limelight;
@@ -24,11 +25,10 @@ public class Limelight {
 
     }
 
-    public Pose3D getLatestPosition(){
+    public Pose3D getLatestPosition(Telemetry telemetry){
         LLResult result = limelight.getLatestResult();
-
-        Pose3D botpose = result.getBotpose_MT2();
-        return botpose;
+        if (result.getFiducialResults().isEmpty()) return result.getBotpose_MT2();
+        return null;
     }
 
 }
