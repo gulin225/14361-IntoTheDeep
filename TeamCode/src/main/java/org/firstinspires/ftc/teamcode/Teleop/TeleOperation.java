@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Claw;
 
 
 @Config
-@TeleOp(name = "test")
+@TeleOp(name = "testt")
 public class TeleOperation extends LinearOpMode {
     Claw claw;
     @Override
@@ -21,12 +21,12 @@ public class TeleOperation extends LinearOpMode {
         waitForStart();
 
        while (!isStopRequested() && opModeIsActive()){
-           telemetry.addLine("COlor Sensor Val" + claw.getColorVal());
-
-           if (claw.getColorVal() > 800){
-               claw.spinOff();
-           }
-           else if(gamepad1.square){
+//           telemetry.addLine("COlor Sensor Val" + claw.getColorVal());
+//
+//           if (claw.getColorVal() > 800){
+//               claw.spinOff();
+//           }
+           if(gamepad1.square){
            //    claw.closeClaw();
                claw.spinOn();
            }

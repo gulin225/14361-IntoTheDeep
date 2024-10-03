@@ -12,14 +12,14 @@ public class Claw {
     public Claw(HardwareMap hardwareMap){
         claw = hardwareMap.servo.get("claw");
         spinner = hardwareMap.crservo.get("spinner");
-        sensor = hardwareMap.get(ColorSensor.class, "colorSensor");
+       // sensor = hardwareMap.get(ColorSensor.class, "colorSensor");
     }
 
     public void openClaw(){
-        claw.setPosition(.15);
+        claw.setPosition(.21);
     }
     public void closeClaw(){
-        claw.setPosition(-.4);
+        claw.setPosition(.4);
     }
     public void spinOn(){
         spinner.setPower(1);
@@ -28,8 +28,8 @@ public class Claw {
         spinner.setPower(0);
     }
 
-    public double getColorVal(){
-        return sensor.red() + sensor.blue() + sensor.green();
-    }
+ //   public double getColorVal(){
+ //       return sensor.red() + sensor.blue() + sensor.green();
+  //  }
 
 }
