@@ -34,11 +34,11 @@ public class RedSpecimenPoukie extends LinearOpMode {
     AutoStates autoStates = preload;
     IMU imu;
     MecanumDrive drive;
-    final Pose2d startPose = new Pose2d(18,-63.5, Math.toRadians(90));
+    final Pose2d startPose = new Pose2d(18,-63.5, Math.toRadians(0));
     TelemetryPacket tel = new TelemetryPacket();
     SequentialAction sampleAction;
     ParallelAction preloadAction;
-    Limelight limelight;
+    //Limelight limelight;
     boolean running;
     final Vector2d targetAprilTag = new Vector2d(71.5,-47.5);
     final double cameraPlacementX = 7.5;
@@ -47,8 +47,8 @@ public class RedSpecimenPoukie extends LinearOpMode {
     final double botCenterHypotenuse = Math.sqrt(Math.pow(cameraPlacementX,2) + Math.pow(cameraPlacementY,2));
     @Override
     public void runOpMode() throws InterruptedException {
-        drive = new MecanumDrive(hardwareMap, startPose);
-        limelight = new Limelight(hardwareMap, telemetry);
+        drive = new MecanumDrive(hardwareMap, startPose, telemetry);
+        //limelight = new Limelight(hardwareMap);
         imu = drive.lazyImu.get();
         imu.resetYaw();
         while(!isStopRequested() && !opModeIsActive()) {
@@ -85,13 +85,7 @@ public class RedSpecimenPoukie extends LinearOpMode {
                 case idle:
                     break;
             }
-            Pose2d updatedPose = updatePoseWithAprilTag();
-            if (updatedPose != null) {
-                //drive.pose = updatedPose;
-                telemetry.addData("LL Location", "x: " + updatedPose.position.x + " Y: " + updatedPose.position.y);
-            } else telemetry.addLine("April tag not in sight");
-            telemetry.addData("RR Location", "x: " + drive.pose.position.x + " Y: " + drive.pose.position.y);
-            telemetry.update();
+            //Pose2d updatedPose = updatePoseWithAprilTag();
         }
     }
 
@@ -108,9 +102,9 @@ public class RedSpecimenPoukie extends LinearOpMode {
     public SequentialAction createSampleAction(){
         //Each action goes to the sample, then deposits it at the human player
         ParallelAction sample1Action = new ParallelAction(drive.actionBuilder(drive.pose)
-                .splineToLinearHeading(new Pose2d(50,-33,Math.toRadians(85.5)), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(50,-33,Math.toRadians(-4.5)), Math.toRadians(90))
                 .waitSeconds(1)
-                .splineToLinearHeading(new Pose2d(55,-57, Math.toRadians(90)), Math.toRadians(340))
+                .splineToLinearHeading(new Pose2d(55,-57, Math.toRadians(0)), Math.toRadians(340))
                 .waitSeconds(1)
                 .build()
         //There should be sleep actions with subsytem movements inside each parallel action
@@ -118,7 +112,7 @@ public class RedSpecimenPoukie extends LinearOpMode {
 
         ParallelAction sample2Action = new ParallelAction(drive.actionBuilder(drive.pose)
                 .lineToY(-33)
-                .splineToLinearHeading(new Pose2d(62,-57,Math.toRadians(85.5)), Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(62,-57,Math.toRadians(-4.5)), Math.toRadians(-90))
                 .waitSeconds(1).build()
         );
 
@@ -137,7 +131,7 @@ public class RedSpecimenPoukie extends LinearOpMode {
         }
     }
 
-    public Pose2d updatePoseWithAprilTag(){
+    /*public Pose2d updatePoseWithAprilTag(){
         double heading = imu.getRobotYawPitchRollAngles().getYaw();
         limelight.limelight.updateRobotOrientation(heading);
         Pose3D botpose = limelight.getLatestPosition(telemetry);
@@ -160,13 +154,11 @@ public class RedSpecimenPoukie extends LinearOpMode {
 
             double botPosX = targetAprilTag.x + absoluteBotX;
             double botPosY = targetAprilTag.y + absoluteBotY;
-
-            telemetry.addData("Cam X", cameraX);
-            telemetry.addData("Cam Y", cameraY);
             newPose = new Pose2d(botPosX, botPosY, heading);
+
         }
         return newPose;
-    }
+    }*/
 }
 
 

@@ -39,6 +39,7 @@ import com.acmerobotics.roadrunner.ftc.LynxFirmware;
 import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
 import com.acmerobotics.roadrunner.ftc.PositionVelocityPair;
 import com.acmerobotics.roadrunner.ftc.RawEncoder;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -48,8 +49,11 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.teamcode.Subsystems.Limelight;
 import org.firstinspires.ftc.teamcode.messages.DriveCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.MecanumCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.MecanumLocalizerInputsMessage;
@@ -60,7 +64,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Config
-public final class MecanumDrive {
+public class MecanumDrive {
     public static class Params {
         // IMU orientation
         // TODO: fill in these values based on
@@ -129,6 +133,15 @@ public final class MecanumDrive {
     private final DownsampledWriter targetPoseWriter = new DownsampledWriter("TARGET_POSE", 50_000_000);
     private final DownsampledWriter driveCommandWriter = new DownsampledWriter("DRIVE_COMMAND", 50_000_000);
     private final DownsampledWriter mecanumCommandWriter = new DownsampledWriter("MECANUM_COMMAND", 50_000_000);
+
+    //new stuff
+    public final Limelight limelight;
+    public Telemetry telemetry;
+    final Vector2d targetAprilTag = new Vector2d(71.5,-47.5);
+    final double cameraPlacementX = 7.5;
+    final double cameraPlacementY = 0;
+    final double cameraAngle = Math.atan(cameraPlacementY/cameraPlacementX);
+    final double botCenterHypotenuse = Math.sqrt(Math.pow(cameraPlacementX,2) + Math.pow(cameraPlacementY,2));
 
     public class DriveLocalizer implements Localizer {
         public final Encoder leftFront, leftBack, rightBack, rightFront;
@@ -214,7 +227,7 @@ public final class MecanumDrive {
         }
     }
 
-    public MecanumDrive(HardwareMap hardwareMap, Pose2d pose) {
+    public MecanumDrive(HardwareMap hardwareMap, Pose2d pose, Telemetry tel) {
         this.pose = pose;
 
         LynxFirmware.throwIfModulesAreOutdated(hardwareMap);
@@ -249,8 +262,41 @@ public final class MecanumDrive {
         localizer = new TwoDeadWheelLocalizer(hardwareMap, lazyImu.get(), PARAMS.inPerTick);
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
+
+        //new stuff
+        limelight = new Limelight(hardwareMap);
+        telemetry = tel;
     }
 
+    public Pose2d updatePoseWithAprilTag(){
+        double heading = this.lazyImu.get().getRobotYawPitchRollAngles().getYaw();
+        limelight.limelight.updateRobotOrientation(heading);
+        Pose3D botpose = limelight.getLatestPosition(telemetry);
+        telemetry.addData("Heading", heading);
+        Pose2d newPose = null;
+        if (botpose != null){
+            double cameraX = (botpose.getPosition().x-1.8002)/0.04203;
+            double cameraY = ((botpose.getPosition().y*39.37)+ 47.3044)/1.65203;
+
+            //if camera is centered
+            double relativeBotX = Math.cos(Math.toRadians(heading))*cameraPlacementX;
+            double relativeBotY = Math.sin(Math.toRadians(heading))*cameraPlacementX;
+
+            //if camera has y displacement from origin
+            relativeBotX = Math.cos(Math.toRadians(heading) + cameraAngle) * botCenterHypotenuse;
+            relativeBotY = Math.sin(Math.toRadians(heading) + cameraAngle) * botCenterHypotenuse;
+
+            double absoluteBotX = cameraX - relativeBotX;
+            double absoluteBotY = cameraY - relativeBotY;
+
+            double botPosX = targetAprilTag.x + absoluteBotX;
+            double botPosY = targetAprilTag.y + absoluteBotY;
+
+            newPose = new Pose2d((botPosX+this.pose.position.x)/2, (botPosY+this.pose.position.y)/2, heading);
+
+        }
+        return newPose;
+    }
     public void setDrivePowers(PoseVelocity2d powers) {
         MecanumKinematics.WheelVelocities<Time> wheelVels = new MecanumKinematics(1).inverse(
                 PoseVelocity2dDual.constant(powers, 1));
@@ -453,13 +499,21 @@ public final class MecanumDrive {
         Twist2dDual<Time> twist = localizer.update();
         pose = pose.plus(twist.value());
 
+        //new stuff
+        Pose2d aprilTagPose = updatePoseWithAprilTag();
+        if (aprilTagPose != null) {
+            pose = aprilTagPose;
+            telemetry.addData("LL Location", "x: " + aprilTagPose.position.x + " Y: " + aprilTagPose.position.y);
+        } else telemetry.addLine("April tag not in sight");
+        telemetry.addData("RR Location", "x: " + this.pose.position.x + " Y: " + this.pose.position.y);
+        telemetry.update();
+
         poseHistory.add(pose);
         while (poseHistory.size() > 100) {
             poseHistory.removeFirst();
         }
 
         estimatedPoseWriter.write(new PoseMessage(pose));
-
         return twist.velocity().value();
     }
 
