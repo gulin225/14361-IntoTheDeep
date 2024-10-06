@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.Autonomous.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Claw;
 
 
@@ -26,6 +27,10 @@ public class TeleOperation extends LinearOpMode {
 //           if (claw.getColorVal() > 800){
 //               claw.spinOff();
 //           }
+           double pos = MecanumDrive.PARAMS.test;
+           double pos2 = MecanumDrive.PARAMS.test2;
+           claw.test(pos, pos2);
+
            if(gamepad1.square){
            //    claw.closeClaw();
                claw.spinOn();
