@@ -88,10 +88,13 @@ public class RedSpecimenPoukie extends LinearOpMode {
             Pose2d updatedPose = updatePoseWithAprilTag();
             if (updatedPose != null) {
                 //drive.pose = updatedPose;
+                updatedPose = new Pose2d((drive.pose.position.x + updatedPose.position.x)/2, (drive.pose.position.y + updatedPose.position.y)/2,drive.pose.heading.toDouble());
+
                 telemetry.addData("LL Location", "x: " + updatedPose.position.x + " Y: " + updatedPose.position.y);
             } else telemetry.addLine("April tag not in sight");
             telemetry.addData("RR Location", "x: " + drive.pose.position.x + " Y: " + drive.pose.position.y);
             telemetry.update();
+
         }
     }
 

@@ -27,7 +27,7 @@ public class Limelight {
 
     public Pose3D getLatestPosition(Telemetry telemetry){
         LLResult result = limelight.getLatestResult();
-        if (result.getFiducialResults().isEmpty()) return result.getBotpose_MT2();
+        if (!result.getFiducialResults().isEmpty()) return result.getBotpose_MT2();
         return null;
     }
 
