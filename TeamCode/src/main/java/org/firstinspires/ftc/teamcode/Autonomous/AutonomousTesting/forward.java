@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.Autonomous.AutonomousTesting;
 
-import static org.firstinspires.ftc.teamcode.Autonomous.AutonomousTesting.AutoStates.idle;
 import static org.firstinspires.ftc.teamcode.Autonomous.AutonomousTesting.AutoStates.preload;
-import static org.firstinspires.ftc.teamcode.Autonomous.AutonomousTesting.AutoStates.samples;
 
 import androidx.annotation.NonNull;
 
@@ -18,25 +16,20 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.IMU;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.Autonomous.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Limelight;
-import org.firstinspires.ftc.teamcode.Autonomous.AutonomousTesting.AprilTagDrive.*;
-
-import java.util.ArrayList;
 
 //-72 y = red side
 //x is pos on red side
 @Config
-@Autonomous(name = "RedSpecimenPoukie", group = "Autonomous")
-public class RedSpecimenPoukie extends LinearOpMode {
+@Autonomous(name = "goforward", group = "Autonomous")
+public class forward extends LinearOpMode {
 
     AutoStates autoStates = preload;
     IMU imu;
     MecanumDrive drive;
-    AprilTagDrive aprilTagDrive;
-    final Pose2d startPose = new Pose2d(18,-63.5, Math.toRadians(0));
+    final Pose2d startPose = new Pose2d(18,-63.5, Math.toRadians(90));
     TelemetryPacket tel = new TelemetryPacket();
     SequentialAction sampleAction;
     ParallelAction preloadAction;
@@ -50,8 +43,6 @@ public class RedSpecimenPoukie extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         drive = new MecanumDrive(hardwareMap, startPose);
-        aprilTagDrive = new AprilTagDrive(hardwareMap, telemetry, positions.redSpecimen);
-        limelight = new Limelight(hardwareMap, telemetry);
         imu = drive.lazyImu.get();
         imu.resetYaw();
         while(!isStopRequested() && !opModeIsActive()) {
@@ -61,70 +52,36 @@ public class RedSpecimenPoukie extends LinearOpMode {
 
         if (isStopRequested()) return;
 
-        autoStates = preload;
-        if (autoStates == idle) {}
-        else {
-            preloadAction = createPreloadAction();
-            running = preloadAction.run(tel);
-        }
-
         while (!isStopRequested() && opModeIsActive()) {
-            switch (autoStates){
-                case preload:
-                    running = preloadAction.run(tel);
-                    if (!running) {
-                        sampleAction = createSampleAction();
-                        running = sampleAction.run(tel);
-                        autoStates = samples;
-                    }
-                    break;
-                case samples:
-                    running = sampleAction.run(tel);
-                    if (!running) {
-
-                        autoStates = idle;
-                    }
-                    break;
-                case idle:
-                    break;
-            }
-            Pose2d updatedPose = updatePoseWithAprilTag();
-            if (updatedPose != null) {
-                //drive.pose = updatedPose;
-                updatedPose = new Pose2d((drive.pose.position.x + updatedPose.position.x)/2, (drive.pose.position.y + updatedPose.position.y)/2,drive.pose.heading.toDouble());
-
-                telemetry.addData("LL Location", "x: " + updatedPose.position.x + " Y: " + updatedPose.position.y);
-            } else telemetry.addLine("April tag not in sight");
-            telemetry.addData("RR Location", "x: " + drive.pose.position.x + " Y: " + drive.pose.position.y);
-            telemetry.update();
+            Actions.runBlocking(new SequentialAction(drive.actionBuilder(startPose).lineToY(0).build()));
 
         }
     }
 
 
     public ParallelAction createPreloadAction(){
-            ParallelAction preloadAction = new ParallelAction(drive.actionBuilder(drive.pose)
-                    .splineToConstantHeading(new Vector2d(18,-45), Math.toRadians(0))
-                    .waitSeconds(2).build()
-            );
+        ParallelAction preloadAction = new ParallelAction(drive.actionBuilder(drive.pose)
+                .splineToConstantHeading(new Vector2d(18,-45), Math.toRadians(0))
+                .waitSeconds(2).build()
+        );
 
-            return  preloadAction;
+        return  preloadAction;
     }
 
     public SequentialAction createSampleAction(){
         //Each action goes to the sample, then deposits it at the human player
         ParallelAction sample1Action = new ParallelAction(drive.actionBuilder(drive.pose)
-                .splineToLinearHeading(new Pose2d(50,-33,Math.toRadians(-4.5)), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(50,-33,Math.toRadians(85.5)), Math.toRadians(90))
                 .waitSeconds(1)
-                .splineToLinearHeading(new Pose2d(55,-57, Math.toRadians(0)), Math.toRadians(340))
+                .splineToLinearHeading(new Pose2d(55,-57, Math.toRadians(90)), Math.toRadians(340))
                 .waitSeconds(1)
                 .build()
-        //There should be sleep actions with subsytem movements inside each parallel action
+                //There should be sleep actions with subsytem movements inside each parallel action
         );
 
         ParallelAction sample2Action = new ParallelAction(drive.actionBuilder(drive.pose)
                 .lineToY(-33)
-                .splineToLinearHeading(new Pose2d(62,-57,Math.toRadians(-4.5)), Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(62,-57,Math.toRadians(85.5)), Math.toRadians(-90))
                 .waitSeconds(1).build()
         );
 
