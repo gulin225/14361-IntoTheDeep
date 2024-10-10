@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Claw;
 @TeleOp(name = "test")
 public class TeleOperation extends LinearOpMode {
     Claw claw;
-    DcMotorEx frontLeftMotor, backLeftMotor, frontRightMotor, backRightMotor;
+    DcMotorEx backLeftSlide, backRightSlide, frontLeftSlide, frontRightSlide;
     @Override
     public void runOpMode() throws InterruptedException {
         //claw = new Claw(hardwareMap);
@@ -21,21 +21,23 @@ public class TeleOperation extends LinearOpMode {
         telemetry.addLine("Hello");
         telemetry.update();
 
-        backRightMotor = hardwareMap.get(DcMotorEx.class,"rightBack");
-        frontRightMotor = hardwareMap.get(DcMotorEx.class,"rightFront");
-        backLeftMotor = hardwareMap.get(DcMotorEx.class,"leftBack");
-        frontLeftMotor = hardwareMap.get(DcMotorEx.class,"leftFront");
-        backLeftMotor.setDirection(DcMotorEx.Direction.REVERSE);
-        frontLeftMotor.setDirection(DcMotorEx.Direction.REVERSE);
-        frontRightMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        //backRightMotor = hardwareMap.get(DcMotorEx.class,"rightBack");
+        //frontRightMotor = hardwareMap.get(DcMotorEx.class,"rightFront");
+        //backLeftMotor = hardwareMap.get(DcMotorEx.class,"leftBack");
+        backLeftSlide = hardwareMap.get(DcMotorEx.class,"test");
+        backRightSlide = hardwareMap.get(DcMotorEx.class,"test2");
+        frontLeftSlide = hardwareMap.get(DcMotorEx.class,"test3");
+        frontRightSlide = hardwareMap.get(DcMotorEx.class,"test4");
+        frontRightSlide.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeftSlide.setDirection(DcMotorSimple.Direction.REVERSE);
         waitForStart();
 
        while (!isStopRequested() && opModeIsActive()){
 
-           frontLeftMotor.setPower(1);
-           backLeftMotor.setPower(1);
-           frontRightMotor.setPower(1);
-           backRightMotor.setPower(1);
+           frontLeftSlide.setPower(1);
+           frontRightSlide.setPower(1);
+           backLeftSlide.setPower(1);
+           backRightSlide.setPower(1);
            telemetry.update();
 
        }
