@@ -14,8 +14,8 @@ public class VerticalSlides {
         backRightSlide = hardwareMap.get(DcMotorEx.class,"rightBackS");
         frontLeftSlide = hardwareMap.get(DcMotorEx.class,"leftFrontS");
         frontRightSlide = hardwareMap.get(DcMotorEx.class,"rightFrontS");
-        frontRightSlide.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeftSlide.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontLeftSlide.setDirection(DcMotorSimple.Direction.REVERSE);
+        backRightSlide.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void test(double one, double two, double three, double four){
