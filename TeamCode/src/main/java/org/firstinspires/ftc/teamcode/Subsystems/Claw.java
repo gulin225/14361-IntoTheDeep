@@ -8,22 +8,29 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Claw {
     ColorSensor sensor;
     Servo claw;
-    CRServo spinner;
+    CRServo activeIntake;
+    public enum clawStates{
+        spinOn, spinOff, open, close
+    }
     public Claw(HardwareMap hardwareMap){
         claw = hardwareMap.servo.get("claw");
-        spinner = hardwareMap.crservo.get("spinner");
+        activeIntake = hardwareMap.crservo.get("activeIntake");
     }
 
-    public void openClaw(){
-        claw.setPosition(.21);
-    }
-    public void closeClaw(){
-        claw.setPosition(.4);
-    }
-    public void spinOn(){
-        spinner.setPower(1);
-    }
-    public void spinOff(){
-        spinner.setPower(0);
+    public void moveClaw(clawStates state){
+        switch (state){
+            case spinOn:
+                activeIntake.setPower(1);
+                break;
+            case spinOff:
+                activeIntake.setPower(0);
+                break;
+            case open:
+                claw.setPosition(.21);
+                break;
+            case close:
+                claw.setPosition(.4);
+                break;
+        }
     }
 }

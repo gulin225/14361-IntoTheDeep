@@ -16,13 +16,8 @@ public class Limelight {
     public Limelight3A limelight;
     public Limelight(HardwareMap hardwareMap, Telemetry telemetry){
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-
-        telemetry.setMsTransmissionInterval(11);
-
         limelight.pipelineSwitch(0);
-
         limelight.start();
-
     }
 
     public Pose3D getLatestPosition(Telemetry telemetry){
