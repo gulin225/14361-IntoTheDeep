@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.Autonomous.AutonomousTesting.AprilTagDrive
 public class LinearRail {
     Servo linearRail, linkage;
     public enum linearRailStates{
-        intake, outtake, test
+        intake, outtake, test,middle
     }
     public LinearRail(HardwareMap hardwareMap){
         linearRail = hardwareMap.servo.get("linearRail");
@@ -23,8 +23,12 @@ public class LinearRail {
                 linkage.setPosition(.23);
                 break;
             case outtake:
-                linearRail.setPosition(.6);
-                linkage.setPosition(.75);
+                linearRail.setPosition(.69); //.69
+                linkage.setPosition(.63); //.63
+                break;
+            case middle:
+                linearRail.setPosition(.4);
+                linkage.setPosition(.5);
                 break;
             case test:
                 linkage.setPosition(AprilTagDrive.PARAMS.kA);
