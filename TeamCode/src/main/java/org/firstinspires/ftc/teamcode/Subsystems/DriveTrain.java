@@ -17,6 +17,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.hardware.bosch.BNO055IMU;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
@@ -25,8 +27,7 @@ public class DriveTrain
 {
     private DcMotorEx leftFront,leftBack,rightBack,rightFront;
     private double offset = 1;
-    public final LazyImu lazyImu;
-    IMU imu;
+    BNO055IMU imu;
     BNO055IMU.Parameters parameters;
     private double x, y, rx, rotX, rotY, denominator, frontLeftPower, backLeftPower, frontRightPower, backRightPower;
     public double slow_mode, botHeading ;
@@ -42,21 +43,22 @@ public class DriveTrain
         rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
         rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
 
-        lazyImu = new LazyImu(hardwareMap, "imu", new RevHubOrientationOnRobot(
-                logoFacingDirection, usbFacingDirection));
-        imu = lazyImu.get();
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        // this is making a new object called 'parameters' that we use to hold the angle the imu is at
+        parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+        imu.initialize(parameters);
     }
 
-    public void resetIMU() {
-        imu.resetYaw();
-    }
 
-    public void fieldCentric(/*GamepadEx driver*/){
-        //y = driver.getLeftY();
-        //x = driver.getLeftX();
-        //rx = -driver.getRightX();
-        botHeading = imu.getRobotYawPitchRollAngles().getYaw();
+    public void fieldCentric(Gamepad driver, Telemetry tel){
+        y = driver.left_stick_y;
+        x = driver.left_stick_x;
+        rx = driver.right_stick_x;
+        botHeading = 0;
 
+        tel.addData("H", botHeading);
+        tel.update();
         rotX = x * Math.cos(botHeading) - y * Math.sin(botHeading);
         rotY = x * Math.sin(botHeading) + y * Math.cos(botHeading);
         denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);

@@ -1,5 +1,4 @@
-package org.firstinspires.ftc.teamcode.Autonomous.AutonomousTesting;
-
+package org.firstinspires.ftc.teamcode.Autonomous;
 
 import androidx.annotation.NonNull;
 
@@ -10,9 +9,8 @@ import com.acmerobotics.roadrunner.AccelConstraint;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Actions;
 import com.acmerobotics.roadrunner.AngularVelConstraint;
+import com.acmerobotics.roadrunner.Arclength;
 import com.acmerobotics.roadrunner.DualNum;
-import com.acmerobotics.roadrunner.HolonomicController;
-import com.acmerobotics.roadrunner.MecanumKinematics;
 import com.acmerobotics.roadrunner.MinVelConstraint;
 import com.acmerobotics.roadrunner.MotorFeedforward;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -21,7 +19,8 @@ import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.PoseVelocity2dDual;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.ProfileParams;
-import com.acmerobotics.roadrunner.Rotation2d;
+import com.acmerobotics.roadrunner.RamseteController;
+import com.acmerobotics.roadrunner.TankKinematics;
 import com.acmerobotics.roadrunner.Time;
 import com.acmerobotics.roadrunner.TimeTrajectory;
 import com.acmerobotics.roadrunner.TimeTurn;
@@ -44,31 +43,22 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-import org.firstinspires.ftc.teamcode.Autonomous.Drawing;
-import org.firstinspires.ftc.teamcode.Autonomous.Localizer;
-import org.firstinspires.ftc.teamcode.Autonomous.TwoDeadWheelLocalizer;
-import org.firstinspires.ftc.teamcode.Subsystems.Limelight;
 import org.firstinspires.ftc.teamcode.Autonomous.messages.DriveCommandMessage;
-import org.firstinspires.ftc.teamcode.Autonomous.messages.MecanumCommandMessage;
-import org.firstinspires.ftc.teamcode.Autonomous.messages.MecanumLocalizerInputsMessage;
 import org.firstinspires.ftc.teamcode.Autonomous.messages.PoseMessage;
+import org.firstinspires.ftc.teamcode.Autonomous.messages.TankCommandMessage;
+import org.firstinspires.ftc.teamcode.Autonomous.messages.TankLocalizerInputsMessage;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 @Config
-public class AprilTagDrive {
-
+public final class TankDrive {
     public static class Params {
         // IMU orientation
         // TODO: fill in these values based on
@@ -76,44 +66,41 @@ public class AprilTagDrive {
         public RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection =
                 RevHubOrientationOnRobot.LogoFacingDirection.UP;
         public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
-                RevHubOrientationOnRobot.UsbFacingDirection.LEFT;
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
         // drive model parameters
-        public double inPerTick = .00196875;
-        public double lateralInPerTick = .00196875;
-        public double trackWidthTicks = 7619;
+        public double inPerTick = 0;
+        public double trackWidthTicks = 0;
 
         // feedforward parameters (in tick units)
-        public double kS = 0.7476420778266628;
-        public double kV = 0.00026895593034389295;
-        public double kA = .000047;
+        public double kS = 0;
+        public double kV = 0;
+        public double kA = 0;
 
         // path profile parameters (in inches)
         public double maxWheelVel = 50;
-        public double minProfileAccel = -40;
-        public double maxProfileAccel = 40;
+        public double minProfileAccel = -30;
+        public double maxProfileAccel = 50;
 
         // turn profile parameters (in radians)
         public double maxAngVel = Math.PI; // shared with path
         public double maxAngAccel = Math.PI;
 
         // path controller gains
-        public double axialGain = 8;
-        public double lateralGain = 6;
-        public double headingGain = 8; // shared with turn
+        public double ramseteZeta = 0.7; // in the range (0, 1)
+        public double ramseteBBar = 2.0; // positive
 
-        public double axialVelGain = 0.0;
-        public double lateralVelGain = 0.0;
-        public double headingVelGain = 0.0; // shared with turn
+        // turn controller gains
+        public double turnGain = 0.0;
+        public double turnVelGain = 0.0;
     }
 
-    public static org.firstinspires.ftc.teamcode.Autonomous.MecanumDrive.Params PARAMS = new org.firstinspires.ftc.teamcode.Autonomous.MecanumDrive.Params();
+    public static Params PARAMS = new Params();
 
-    public final MecanumKinematics kinematics = new MecanumKinematics(
-            PARAMS.inPerTick * PARAMS.trackWidthTicks, PARAMS.inPerTick / PARAMS.lateralInPerTick);
+    public final TankKinematics kinematics = new TankKinematics(PARAMS.inPerTick * PARAMS.trackWidthTicks);
 
     public final TurnConstraints defaultTurnConstraints = new TurnConstraints(
-            PARAMS.maxAngVel, -PARAMS.maxAngAccel, PARAMS.maxAngAccel);
+            PARAMS.maxAngVel, -PARAMS.maxAngVel, PARAMS.maxAngAccel);
     public final VelConstraint defaultVelConstraint =
             new MinVelConstraint(Arrays.asList(
                     kinematics.new WheelVelConstraint(PARAMS.maxWheelVel),
@@ -122,11 +109,11 @@ public class AprilTagDrive {
     public final AccelConstraint defaultAccelConstraint =
             new ProfileAccelConstraint(PARAMS.minProfileAccel, PARAMS.maxProfileAccel);
 
-    public final DcMotorEx leftFront, leftBack, rightBack, rightFront;
-
-    public final VoltageSensor voltageSensor;
+    public final List<DcMotorEx> leftMotors, rightMotors;
 
     public final LazyImu lazyImu;
+
+    public final VoltageSensor voltageSensor;
 
     public final Localizer localizer;
     public Pose2d pose;
@@ -136,25 +123,97 @@ public class AprilTagDrive {
     private final DownsampledWriter estimatedPoseWriter = new DownsampledWriter("ESTIMATED_POSE", 50_000_000);
     private final DownsampledWriter targetPoseWriter = new DownsampledWriter("TARGET_POSE", 50_000_000);
     private final DownsampledWriter driveCommandWriter = new DownsampledWriter("DRIVE_COMMAND", 50_000_000);
-    private final DownsampledWriter mecanumCommandWriter = new DownsampledWriter("MECANUM_COMMAND", 50_000_000);
 
-    Telemetry telemetry;
-    Limelight limelight;
+    private final DownsampledWriter tankCommandWriter = new DownsampledWriter("TANK_COMMAND", 50_000_000);
 
-    public enum positions{
-        redBucket,
-        redSpecimen,
-        blueBucket,
-        blueSpecimen
+    public class DriveLocalizer implements Localizer {
+        public final List<Encoder> leftEncs, rightEncs;
+
+        private double lastLeftPos, lastRightPos;
+        private boolean initialized;
+
+        public DriveLocalizer() {
+            {
+                List<Encoder> leftEncs = new ArrayList<>();
+                for (DcMotorEx m : leftMotors) {
+                    Encoder e = new OverflowEncoder(new RawEncoder(m));
+                    leftEncs.add(e);
+                }
+                this.leftEncs = Collections.unmodifiableList(leftEncs);
+            }
+
+            {
+                List<Encoder> rightEncs = new ArrayList<>();
+                for (DcMotorEx m : rightMotors) {
+                    Encoder e = new OverflowEncoder(new RawEncoder(m));
+                    rightEncs.add(e);
+                }
+                this.rightEncs = Collections.unmodifiableList(rightEncs);
+            }
+
+            // TODO: reverse encoder directions if needed
+            //   leftEncs.get(0).setDirection(DcMotorSimple.Direction.REVERSE);
+        }
+
+        @Override
+        public Twist2dDual<Time> update() {
+            List<PositionVelocityPair> leftReadings = new ArrayList<>(), rightReadings = new ArrayList<>();
+            double meanLeftPos = 0.0, meanLeftVel = 0.0;
+            for (Encoder e : leftEncs) {
+                PositionVelocityPair p = e.getPositionAndVelocity();
+                meanLeftPos += p.position;
+                meanLeftVel += p.velocity;
+                leftReadings.add(p);
+            }
+            meanLeftPos /= leftEncs.size();
+            meanLeftVel /= leftEncs.size();
+
+            double meanRightPos = 0.0, meanRightVel = 0.0;
+            for (Encoder e : rightEncs) {
+                PositionVelocityPair p = e.getPositionAndVelocity();
+                meanRightPos += p.position;
+                meanRightVel += p.velocity;
+                rightReadings.add(p);
+            }
+            meanRightPos /= rightEncs.size();
+            meanRightVel /= rightEncs.size();
+
+            FlightRecorder.write("TANK_LOCALIZER_INPUTS",
+                     new TankLocalizerInputsMessage(leftReadings, rightReadings));
+
+            if (!initialized) {
+                initialized = true;
+
+                lastLeftPos = meanLeftPos;
+                lastRightPos = meanRightPos;
+
+                return new Twist2dDual<>(
+                        Vector2dDual.constant(new Vector2d(0.0, 0.0), 2),
+                        DualNum.constant(0.0, 2)
+                );
+            }
+
+            TankKinematics.WheelIncrements<Time> twist = new TankKinematics.WheelIncrements<>(
+                    new DualNum<Time>(new double[] {
+                            meanLeftPos - lastLeftPos,
+                            meanLeftVel
+                    }).times(PARAMS.inPerTick),
+                    new DualNum<Time>(new double[] {
+                            meanRightPos - lastRightPos,
+                            meanRightVel,
+                    }).times(PARAMS.inPerTick)
+            );
+
+            lastLeftPos = meanLeftPos;
+            lastRightPos = meanRightPos;
+
+            return kinematics.forward(twist);
+        }
     }
 
-    Vector2d targetAprilTag;
-    final double cameraPlacementX = 7.5;
-    final double cameraPlacementY = 0;
-    final double cameraAngle = Math.atan(cameraPlacementY/cameraPlacementX);
-    final double botCenterHypotenuse = Math.sqrt(Math.pow(cameraPlacementX,2) + Math.pow(cameraPlacementY,2));
+    public TankDrive(HardwareMap hardwareMap, Pose2d pose) {
+        this.pose = pose;
 
-    public AprilTagDrive(HardwareMap hardwareMap, Telemetry tel, positions corner) {
         LynxFirmware.throwIfModulesAreOutdated(hardwareMap);
 
         for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
@@ -162,21 +221,21 @@ public class AprilTagDrive {
         }
 
         // TODO: make sure your config has motors with these names (or change them)
+        //   add additional motors on each side if you have them
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
-        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
-        leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
-        rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+        leftMotors = Arrays.asList(hardwareMap.get(DcMotorEx.class, "left"));
+        rightMotors = Arrays.asList(hardwareMap.get(DcMotorEx.class, "right"));
 
-        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        for (DcMotorEx m : leftMotors) {
+            m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        }
+        for (DcMotorEx m : rightMotors) {
+            m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        }
 
         // TODO: reverse motor directions if needed
-        //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
+        //   leftMotors.get(0).setDirection(DcMotorSimple.Direction.REVERSE);
+
         // TODO: make sure your config has an IMU with this name (can be BNO or BHI)
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
         lazyImu = new LazyImu(hardwareMap, "imu", new RevHubOrientationOnRobot(
@@ -184,25 +243,13 @@ public class AprilTagDrive {
 
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        localizer = new TwoDeadWheelLocalizer(hardwareMap, lazyImu.get(), PARAMS.inPerTick);
+        localizer = new TankDrive.DriveLocalizer();
 
-        FlightRecorder.write("MECANUM_PARAMS", PARAMS);
-
-        telemetry = tel;
-        limelight = new Limelight(hardwareMap, telemetry);
-        Pose2d startPose = new Pose2d(0,0,0);
-
-        switch (corner){
-            case redSpecimen:
-                targetAprilTag = new Vector2d(71.5,-47.5);
-                startPose = new Pose2d(18,-63.5, Math.toRadians(0));
-                break;
-        }
-        this.pose = startPose;
+        FlightRecorder.write("TANK_PARAMS", PARAMS);
     }
 
     public void setDrivePowers(PoseVelocity2d powers) {
-        MecanumKinematics.WheelVelocities<Time> wheelVels = new MecanumKinematics(1).inverse(
+        TankKinematics.WheelVelocities<Time> wheelVels = new TankKinematics(2).inverse(
                 PoseVelocity2dDual.constant(powers, 1));
 
         double maxPowerMag = 1;
@@ -210,10 +257,12 @@ public class AprilTagDrive {
             maxPowerMag = Math.max(maxPowerMag, power.value());
         }
 
-        leftFront.setPower(wheelVels.leftFront.get(0) / maxPowerMag);
-        leftBack.setPower(wheelVels.leftBack.get(0) / maxPowerMag);
-        rightBack.setPower(wheelVels.rightBack.get(0) / maxPowerMag);
-        rightFront.setPower(wheelVels.rightFront.get(0) / maxPowerMag);
+        for (DcMotorEx m : leftMotors) {
+            m.setPower(wheelVels.left.get(0) / maxPowerMag);
+        }
+        for (DcMotorEx m : rightMotors) {
+            m.setPower(wheelVels.right.get(0) / maxPowerMag);
+        }
     }
 
     public final class FollowTrajectoryAction implements Action {
@@ -248,43 +297,41 @@ public class AprilTagDrive {
             }
 
             if (t >= timeTrajectory.duration) {
-                leftFront.setPower(0);
-                leftBack.setPower(0);
-                rightBack.setPower(0);
-                rightFront.setPower(0);
+                for (DcMotorEx m : leftMotors) {
+                    m.setPower(0);
+                }
+                for (DcMotorEx m : rightMotors) {
+                    m.setPower(0);
+                }
 
                 return false;
             }
 
-            Pose2dDual<Time> txWorldTarget = timeTrajectory.get(t);
+            DualNum<Time> x = timeTrajectory.profile.get(t);
+
+            Pose2dDual<Arclength> txWorldTarget = timeTrajectory.path.get(x.value(), 3);
             targetPoseWriter.write(new PoseMessage(txWorldTarget.value()));
 
-            PoseVelocity2d robotVelRobot = updatePoseEstimate(telemetry);
+            updatePoseEstimate();
 
-            PoseVelocity2dDual<Time> command = new HolonomicController(
-                    PARAMS.axialGain, PARAMS.lateralGain, PARAMS.headingGain,
-                    PARAMS.axialVelGain, PARAMS.lateralVelGain, PARAMS.headingVelGain
-            )
-                    .compute(txWorldTarget, pose, robotVelRobot);
+            PoseVelocity2dDual<Time> command = new RamseteController(kinematics.trackWidth, PARAMS.ramseteZeta, PARAMS.ramseteBBar)
+                    .compute(x, txWorldTarget, pose);
             driveCommandWriter.write(new DriveCommandMessage(command));
 
-            MecanumKinematics.WheelVelocities<Time> wheelVels = kinematics.inverse(command);
+            TankKinematics.WheelVelocities<Time> wheelVels = kinematics.inverse(command);
             double voltage = voltageSensor.getVoltage();
-
             final MotorFeedforward feedforward = new MotorFeedforward(PARAMS.kS,
                     PARAMS.kV / PARAMS.inPerTick, PARAMS.kA / PARAMS.inPerTick);
-            double leftFrontPower = feedforward.compute(wheelVels.leftFront) / voltage;
-            double leftBackPower = feedforward.compute(wheelVels.leftBack) / voltage;
-            double rightBackPower = feedforward.compute(wheelVels.rightBack) / voltage;
-            double rightFrontPower = feedforward.compute(wheelVels.rightFront) / voltage;
-            mecanumCommandWriter.write(new MecanumCommandMessage(
-                    voltage, leftFrontPower, leftBackPower, rightBackPower, rightFrontPower
-            ));
+            double leftPower = feedforward.compute(wheelVels.left) / voltage;
+            double rightPower = feedforward.compute(wheelVels.right) / voltage;
+            tankCommandWriter.write(new TankCommandMessage(voltage, leftPower, rightPower));
 
-            leftFront.setPower(leftFrontPower);
-            leftBack.setPower(leftBackPower);
-            rightBack.setPower(rightBackPower);
-            rightFront.setPower(rightFrontPower);
+            for (DcMotorEx m : leftMotors) {
+                m.setPower(leftPower);
+            }
+            for (DcMotorEx m : rightMotors) {
+                m.setPower(rightPower);
+            }
 
             p.put("x", pose.position.x);
             p.put("y", pose.position.y);
@@ -340,10 +387,12 @@ public class AprilTagDrive {
             }
 
             if (t >= turn.duration) {
-                leftFront.setPower(0);
-                leftBack.setPower(0);
-                rightBack.setPower(0);
-                rightFront.setPower(0);
+                for (DcMotorEx m : leftMotors) {
+                    m.setPower(0);
+                }
+                for (DcMotorEx m : rightMotors) {
+                    m.setPower(0);
+                }
 
                 return false;
             }
@@ -351,31 +400,31 @@ public class AprilTagDrive {
             Pose2dDual<Time> txWorldTarget = turn.get(t);
             targetPoseWriter.write(new PoseMessage(txWorldTarget.value()));
 
-            PoseVelocity2d robotVelRobot = updatePoseEstimate(telemetry);
+            PoseVelocity2d robotVelRobot = updatePoseEstimate();
 
-            PoseVelocity2dDual<Time> command = new HolonomicController(
-                    PARAMS.axialGain, PARAMS.lateralGain, PARAMS.headingGain,
-                    PARAMS.axialVelGain, PARAMS.lateralVelGain, PARAMS.headingVelGain
-            )
-                    .compute(txWorldTarget, pose, robotVelRobot);
+            PoseVelocity2dDual<Time> command = new PoseVelocity2dDual<>(
+                    Vector2dDual.constant(new Vector2d(0, 0), 3),
+                    txWorldTarget.heading.velocity().plus(
+                            PARAMS.turnGain * pose.heading.minus(txWorldTarget.heading.value()) +
+                            PARAMS.turnVelGain * (robotVelRobot.angVel - txWorldTarget.heading.velocity().value())
+                    )
+            );
             driveCommandWriter.write(new DriveCommandMessage(command));
 
-            MecanumKinematics.WheelVelocities<Time> wheelVels = kinematics.inverse(command);
+            TankKinematics.WheelVelocities<Time> wheelVels = kinematics.inverse(command);
             double voltage = voltageSensor.getVoltage();
             final MotorFeedforward feedforward = new MotorFeedforward(PARAMS.kS,
                     PARAMS.kV / PARAMS.inPerTick, PARAMS.kA / PARAMS.inPerTick);
-            double leftFrontPower = feedforward.compute(wheelVels.leftFront) / voltage;
-            double leftBackPower = feedforward.compute(wheelVels.leftBack) / voltage;
-            double rightBackPower = feedforward.compute(wheelVels.rightBack) / voltage;
-            double rightFrontPower = feedforward.compute(wheelVels.rightFront) / voltage;
-            mecanumCommandWriter.write(new MecanumCommandMessage(
-                    voltage, leftFrontPower, leftBackPower, rightBackPower, rightFrontPower
-            ));
+            double leftPower = feedforward.compute(wheelVels.left) / voltage;
+            double rightPower = feedforward.compute(wheelVels.right) / voltage;
+            tankCommandWriter.write(new TankCommandMessage(voltage, leftPower, rightPower));
 
-            leftFront.setPower(feedforward.compute(wheelVels.leftFront) / voltage);
-            leftBack.setPower(feedforward.compute(wheelVels.leftBack) / voltage);
-            rightBack.setPower(feedforward.compute(wheelVels.rightBack) / voltage);
-            rightFront.setPower(feedforward.compute(wheelVels.rightFront) / voltage);
+            for (DcMotorEx m : leftMotors) {
+                m.setPower(leftPower);
+            }
+            for (DcMotorEx m : rightMotors) {
+                m.setPower(rightPower);
+            }
 
             Canvas c = p.fieldOverlay();
             drawPoseHistory(c);
@@ -399,20 +448,9 @@ public class AprilTagDrive {
         }
     }
 
-    public PoseVelocity2d updatePoseEstimate(Telemetry tel) {
+    public PoseVelocity2d updatePoseEstimate() {
         Twist2dDual<Time> twist = localizer.update();
-        Pose2d odoPose = pose.plus(twist.value());
-        Pose2d aprilTagPose = updatePoseWithAprilTag(tel);
-
-        tel.addData("odometry", odoPose.toString());
-        if (aprilTagPose != null){
-            double weightedX = (pose.position.x + aprilTagPose.position.x)/2;
-            double weightedY = (pose.position.y + aprilTagPose.position.y)/2;
-            Pose2d weightedPose = new Pose2d(weightedX, weightedY,pose.heading.toDouble());
-            tel.addData("apriltag", weightedPose.toString());
-            pose = odoPose;
-        }
-        else pose = odoPose;
+        pose = pose.plus(twist.value());
 
         poseHistory.add(pose);
         while (poseHistory.size() > 100) {
@@ -421,37 +459,7 @@ public class AprilTagDrive {
 
         estimatedPoseWriter.write(new PoseMessage(pose));
 
-        tel.update();
         return twist.velocity().value();
-    }
-
-    public Pose2d updatePoseWithAprilTag(Telemetry tel){
-        double heading = pose.heading.toDouble();
-        limelight.limelight.updateRobotOrientation(heading);
-        Pose3D botpose = limelight.getLatestPosition(telemetry);
-
-        Pose2d newPose = null;
-        if (botpose != null){
-            double cameraX = (botpose.getPosition().x-1.8002)/0.04203;
-            double cameraY = ((botpose.getPosition().y*39.37)+ 47.3044)/1.65203;
-
-            //if camera is centered
-            double relativeBotX = Math.cos(Math.toRadians(heading))*cameraPlacementX;
-            double relativeBotY = Math.sin(Math.toRadians(heading))*cameraPlacementX;
-
-            //if camera has y displacement from origin
-            relativeBotX = Math.cos(Math.toRadians(heading) + cameraAngle) * botCenterHypotenuse;
-            relativeBotY = Math.sin(Math.toRadians(heading) + cameraAngle) * botCenterHypotenuse;
-
-            double absoluteBotX = cameraX - relativeBotX;
-            double absoluteBotY = cameraY - relativeBotY;
-
-            double botPosX = targetAprilTag.x + absoluteBotX;
-            double botPosY = targetAprilTag.y + absoluteBotY;
-
-            newPose = new Pose2d(botPosX, botPosY, heading);
-        }
-        return newPose;
     }
 
     private void drawPoseHistory(Canvas c) {
@@ -473,8 +481,8 @@ public class AprilTagDrive {
 
     public TrajectoryActionBuilder actionBuilder(Pose2d beginPose) {
         return new TrajectoryActionBuilder(
-                AprilTagDrive.TurnAction::new,
-                AprilTagDrive.FollowTrajectoryAction::new,
+                TurnAction::new,
+                FollowTrajectoryAction::new,
                 new TrajectoryBuilderParams(
                         1e-6,
                         new ProfileParams(
@@ -486,5 +494,4 @@ public class AprilTagDrive {
                 defaultVelConstraint, defaultAccelConstraint
         );
     }
-
 }

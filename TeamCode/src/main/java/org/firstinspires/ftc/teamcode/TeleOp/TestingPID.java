@@ -1,40 +1,36 @@
-package org.firstinspires.ftc.teamcode.Subsystems;
-
-import android.sax.StartElementListener;
+package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-
-import org.firstinspires.ftc.teamcode.Autonomous.AutonomousTesting.AprilTagDrive;
-
-public class VerticalSlides {
-    private PIDController controllerUp, controllerDown;
+@Config
+@TeleOp(name = "TestingPID")
+public class TestingPID extends OpMode {
+private PIDController controllerUp, controllerDown;
 
 
     boolean leftBackFrontRight = true;
     public static double f = 0.1;
 
-    public enum slideStates{
-        intake, lowBasket, highRung, highBasket
-    }
-   public static int target =0;
+    public static int target =0;
     //p = 0.01 d = .001
     public static double pUp = 0.021, iUp = 0, dUp = 0.000225;
-    int num;
     public static double pDown = 0.015, iDown = 0, dDown = 0.00012;
     public final double ticks_in_degrees = 145.1/360; //num of ticks per rotation we need to find this out
     DcMotorEx backLeftSlide, backRightSlidePID, frontLeftSlide, frontRightSlide;
 
-
-    public VerticalSlides(HardwareMap hardwareMap){
+    //max = 1060
+    @Override
+    public void init() {
         controllerUp = new PIDController(pUp,iUp,dUp);
         controllerDown = new PIDController(pDown, iDown, dDown);
-
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         backLeftSlide = hardwareMap.get(DcMotorEx.class,"leftBackS");
         backRightSlidePID = hardwareMap.get(DcMotorEx.class,"rightBackS");
@@ -42,18 +38,19 @@ public class VerticalSlides {
         frontRightSlide = hardwareMap.get(DcMotorEx.class,"rightFrontS");
 
 
-        backRightSlidePID.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+       backRightSlidePID.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         backRightSlidePID.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-
+        //backRightSlidePID.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         frontLeftSlide.setDirection(DcMotorSimple.Direction.REVERSE);
         backRightSlidePID.setDirection(DcMotorSimple.Direction.REVERSE);
-
+    //   backLeftSlide.setDirection(DcMotorSimple.Direction.REVERSE);
+    //    frontRightSlide.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
-
-    public void PIDLoop(){
+    @Override
+    public void loop() {
 
         int armPos = backRightSlidePID.getCurrentPosition();
 
@@ -65,11 +62,15 @@ public class VerticalSlides {
 
             double power = pid + ff;
             if(power > 1) power = 1;
+            telemetry.addData("arm pos", armPos);
+            telemetry.addData("target", target);
+            telemetry.addData("power",power);
+
             backRightSlidePID.setPower(power);
             backLeftSlide.setPower(power);
-            frontLeftSlide.setPower(power);
+           frontLeftSlide.setPower(power);
             frontRightSlide.setPower(power);
-
+            telemetry.update();
         }
         else{
             controllerDown.setPID(pDown, iDown,dDown);
@@ -79,7 +80,21 @@ public class VerticalSlides {
 
             double power = pid + ff;
 
-            num = 1;
+            telemetry.addData("arm pos", armPos);
+            telemetry.addData("target", target);
+
+          //
+//            if(leftBackFrontRight){
+//                backLeftSlide.setPower(power);
+//                frontRightSlide.setPower(power);
+//                leftBackFrontRight = false;
+//            }
+//            else{
+//                backRightSlidePID.setPower(power);
+//                frontLeftSlide.setPower(power);
+//                leftBackFrontRight = true;
+//            }
+            int num = 1;
             if(num == 1){
                 backLeftSlide.setPower(power);
                 frontRightSlide.setPower(power);
@@ -103,58 +118,9 @@ public class VerticalSlides {
             }
 
 
+            //
+
+            telemetry.update();
         }
     }
-
-    public void setSlidesUp(){
-        target = 500;
-    }
-
-    public void setSlidesDown(){
-        target = 0;
-    }
-
-    public void setSlides(slideStates state){
-        switch (state){
-            case intake:
-                target=0;
-                break;
-            case lowBasket:
-                target=200;
-                break;
-            case highRung:
-                target=800;
-                break;
-            case highBasket:
-                target=1000;
-                break;
-        }
-    }
-
-    public void test(double one, double two, double three, double four){
-        backLeftSlide.setPower(one);
-        backRightSlidePID.setPower(two);
-        frontLeftSlide.setPower(three);
-        frontRightSlide.setPower(four);
-
-    }
-    public void setPowerZero(){
-        backLeftSlide.setPower(0);
-        backRightSlidePID.setPower(0);
-        frontLeftSlide.setPower(0);
-        frontRightSlide.setPower(0);
-    }
-
-    public int getTarget(){
-        return target;
-    }
-    public int getCurrent(){
-        return backRightSlidePID.getCurrentPosition();
-    }
-
-    public void testBackLeft(){
-        backLeftSlide.setPower(.5);
-    }
-
-
 }

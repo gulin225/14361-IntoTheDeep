@@ -14,15 +14,17 @@ public class Robot {
     public Robot(HardwareMap hardwareMap, Telemetry telemetry){
         linearRail = new LinearRail(hardwareMap);
         claw = new Claw(hardwareMap);
-        limelight = new Limelight(hardwareMap, telemetry);
+     //   limelight = new Limelight(hardwareMap, telemetry);
         driveTrain = new DriveTrain(hardwareMap);
         verticalSlides = new VerticalSlides(hardwareMap);
     }
 
     public void init(){
+        verticalSlides.setSlides(VerticalSlides.slideStates.intake);
         claw.moveClaw(Claw.clawStates.wristIntake);
-        claw.moveClaw(Claw.clawStates.intake);
-        linearRail.moveRail(LinearRail.linearRailStates.intake);
+        claw.moveClaw(Claw.clawStates.outtake);
+        linearRail.moveRail(LinearRail.linearRailStates.outtake);
+
     }
 
     public void intake(){

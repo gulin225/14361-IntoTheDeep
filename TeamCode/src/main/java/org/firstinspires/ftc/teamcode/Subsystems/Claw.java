@@ -10,8 +10,8 @@ import org.firstinspires.ftc.teamcode.Autonomous.MecanumDrive;
 
 public class Claw {
     ColorSensor sensor;
-    Servo claw, leftArm, rightArm, wrist;
-    CRServo activeIntake;
+    public Servo claw, leftArm, rightArm, wrist;
+    public CRServo activeIntake;
     public enum clawStates{
         spinOn, spinOff, open, close, intake, outtake, wristIntake, wristOuttake
     }
@@ -27,7 +27,7 @@ public class Claw {
     public void moveClaw(clawStates state){
         switch (state){
             case spinOn:
-                activeIntake.setPower(1);
+                activeIntake.setPower(-1);
                 break;
             case spinOff:
                 activeIntake.setPower(0);
@@ -39,8 +39,8 @@ public class Claw {
                 claw.setPosition(.4);
                 break;
             case intake:
-                leftArm.setPosition(.3);
-                rightArm.setPosition(.3+armOffset);
+                leftArm.setPosition(.32);
+                rightArm.setPosition(.32+armOffset);
                 break;
             case outtake:
                 leftArm.setPosition(.76);
@@ -48,6 +48,7 @@ public class Claw {
                 break;
             case wristIntake:
                 wrist.setPosition(.15);
+                break;
         }
     }
 }
