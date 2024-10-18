@@ -26,7 +26,7 @@ public class LinearRailActions {
                 initialized = true;
             }
 
-            return true;
+            return false;
         }
     }
 
@@ -40,7 +40,7 @@ public class LinearRailActions {
                 initialized = true;
             }
 
-            return true;
+            return false;
         }
     }
 

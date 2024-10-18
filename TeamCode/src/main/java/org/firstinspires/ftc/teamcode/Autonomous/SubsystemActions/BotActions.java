@@ -42,21 +42,27 @@ public class BotActions {
         ParallelAction outtakingHighBasket = new ParallelAction(
                 linearRailActions.outtakeAction(),
                 slideActions.highBasketAction(),
-                clawActions.armOuttakeAction(),
-                clawActions.spinOffAction(),
-                clawActions.closeClawAction()
+                clawActions.armOuttakeAction()
         );
         return outtakingHighBasket;
     }
 
-    public SequentialAction intake(){
-        SequentialAction intakeAfterSpecimen = new SequentialAction(
+    public ParallelAction intake(){
+        ParallelAction intakeAfterSpecimen = new ParallelAction(
                 slideActions.intakeAction(),
                 clawActions.openClawAction(),
-                clawActions.armIntakeFlat(),
+                linearRailActions.intakeAction(),
                 clawActions.spinOnAction()
         );
         return intakeAfterSpecimen;
+    }
+    public SequentialAction clampSample(){
+        SequentialAction clampSample = new SequentialAction(
+                clawActions.closeClawAction(),
+                new SleepAction(.3),
+                clawActions.spinOffAction()
+        );
+        return clampSample;
     }
 
 }

@@ -26,7 +26,7 @@ public class SlideActions {
                 initialized = true;
             }
 
-            return true;
+            return false;
         }
     }
     public class PIDLoop implements Action {
@@ -39,7 +39,7 @@ public class SlideActions {
                 initialized = true;
             }
 
-            return true;
+            return false;
         }
     }
     public class highRung implements Action {
@@ -52,7 +52,7 @@ public class SlideActions {
                 initialized = true;
             }
 
-            return true;
+            return false;
         }
     }
     public class highBasket implements Action {
@@ -65,7 +65,7 @@ public class SlideActions {
                 initialized = true;
             }
 
-            return true;
+            return false;
         }
     }
     public class pullDownRung implements Action {
@@ -78,32 +78,10 @@ public class SlideActions {
                 initialized = true;
             }
 
-            return true;
+            return false;
         }
     }
 
-//    public class slidePIDHighBasket implements Action{
-//        private boolean initialized = false;
-//
-//        @Override
-//        public boolean run(@NonNull TelemetryPacket packet) {
-//            if (!initialized) {
-//                verticalSlides.setSlides(VerticalSlides.slideStates.highRung);
-//                verticalSlides.PIDLoop();
-//                initialized = true;
-//            }
-//
-//            if(Math.abs(verticalSlides.getCurrent() - verticalSlides.getTarget()) < 50){
-//                verticalSlides.setPowerZero();
-//                return true;
-//            }
-//            else{
-//                verticalSlides.PIDLoop();
-//                return false;
-//            }
-//
-//        }
-//    }
     public Action highBasketAction(){
         return new highBasket();
     }

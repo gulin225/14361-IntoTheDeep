@@ -22,7 +22,7 @@ public class ClawActions {
                 initialized = true;
             }
 
-            return true;
+            return false;
         }
     }
     public class openClaw implements Action {
@@ -35,7 +35,7 @@ public class ClawActions {
                 initialized = true;
             }
 
-            return true;
+            return false;
         }
     }
     public class armOuttake implements Action {
@@ -48,7 +48,7 @@ public class ClawActions {
                 initialized = true;
             }
 
-            return true;
+            return false;
         }
     }
     public class armIntake implements Action {
@@ -61,7 +61,7 @@ public class ClawActions {
                 initialized = true;
             }
 
-            return true;
+            return false;
         }
     }
     public class armFlatIntake implements Action {
@@ -74,7 +74,7 @@ public class ClawActions {
                 initialized = true;
             }
 
-            return true;
+            return false;
         }
     }
     public class wristIntake implements Action {
@@ -87,7 +87,7 @@ public class ClawActions {
                 initialized = true;
             }
 
-            return true;
+            return false;
         }
     }
     public class spinOn implements Action {
@@ -100,7 +100,7 @@ public class ClawActions {
                 initialized = true;
             }
 
-            return true;
+            return false;
         }
     }
     public class spinOff implements Action {
@@ -113,7 +113,7 @@ public class ClawActions {
                 initialized = true;
             }
 
-            return true;
+            return false;
         }
     }
 

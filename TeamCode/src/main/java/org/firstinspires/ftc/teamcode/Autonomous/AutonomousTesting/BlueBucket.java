@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.Autonomous.PinpointDrive;
 import org.firstinspires.ftc.teamcode.Autonomous.SubsystemActions.BotActions;
+import org.firstinspires.ftc.teamcode.Autonomous.SubsystemActions.ClawActions;
 import org.firstinspires.ftc.teamcode.Subsystems.LinearRail;
 import org.firstinspires.ftc.teamcode.Subsystems.Robot;
 
@@ -48,7 +49,6 @@ public class BlueBucket extends LinearOpMode {
             path = createPath();
             running = path.run(tel);
         }
-        botActions.init().run(tel);
 
         while (!isStopRequested() && opModeIsActive()) {
             SlidePIDLoop = botActions.slideActions.PID();
@@ -56,23 +56,7 @@ public class BlueBucket extends LinearOpMode {
             switch (autoStates){
                 case state1:
                     running = path.run(tel);
-                    if (!running) {
-                        autoStates = AutoStates.state2;
-                        botActions.intake().run(tel);
-                        path2 = createPath2();
-                    }
-                    break;
-                case state2:
-                    running = path2.run(tel);
-                    if (!running) {
-                        autoStates = state3;
-                        botActions.linearRailActions.intakeAction().run(tel);
-                        path3 = createPath3();
-                    }
-                    break;
-                case state3:
-                    //running = path3.run(tel);
-                    if (!running) autoStates = idle;
+                    if (!running) autoStates = AutoStates.idle;
                     break;
                 case idle:
                     break;
@@ -84,80 +68,39 @@ public class BlueBucket extends LinearOpMode {
     }
 
     public SequentialAction createPath(){
-        SequentialAction path1 = new SequentialAction(
-                drive.actionBuilder(drive.pose)
-                    .setTangent(Math.toRadians(0))
-                    .splineToConstantHeading(new Vector2d(30.2,-15), Math.toRadians(0)).build(),
-                new SleepAction(1.2)
-                /*new ParallelAction(drive.actionBuilder(new Pose2d(42,-24, Math.toRadians(-90)))
-                    .setTangent(Math.toRadians(0))
-                    .splineToLinearHeading(new Pose2d(10,-34,Math.toRadians(-225)),Math.toRadians(0)).build(),
-                    new SequentialAction(
-                        botActions.outtakeHighBasket(),
-                        new SleepAction(2),
-                        botActions.clawActions.openClawAction()
-                    )
-                ),
-                new ParallelAction(drive.actionBuilder(new Pose2d(10,-34,Math.toRadians(-225)))
-                    .setTangent(Math.toRadians(180))
-                    .splineToLinearHeading(new Pose2d(25,-37,Math.toRadians(-180)),Math.toRadians(180)).build(),
-                    new SequentialAction(
-                            botActions.intake(),
-                            new SleepAction(2),
-                            botActions.clawActions.spinOffAction()
-                    )
-                ),
-                new ParallelAction(drive.actionBuilder(new Pose2d(25,-37,Math.toRadians(-180)))
-                    .setTangent(Math.toRadians(0))
-                    .splineToLinearHeading(new Pose2d(10,-34,Math.toRadians(-225)),Math.toRadians(0)).build(),
-                    new SequentialAction(
-                            botActions.outtakeHighBasket(),
-                            new SleepAction(2),
-                            botActions.clawActions.openClawAction()
-                    )
-                ),
-                new ParallelAction(drive.actionBuilder(new Pose2d(10,-34,Math.toRadians(-225)))
-                    .setTangent(Math.toRadians(0))
-                    .splineToLinearHeading(new Pose2d(30,-40,Math.toRadians(-100)),Math.toRadians(0)).build(),
-                    new SequentialAction(
-                            botActions.intake(),
-                            new SleepAction(2),
-                            botActions.clawActions.spinOffAction()
-                    )
-                ),
-                new ParallelAction(drive.actionBuilder(new Pose2d(25,-39,Math.toRadians(-100)))
-                    .setTangent(Math.toRadians(0))
-                    .splineToLinearHeading(new Pose2d(10,-34,Math.toRadians(-225)),Math.toRadians(0)).build(),
-                    new SequentialAction(
-                            botActions.outtakeHighBasket(),
-                            new SleepAction(2),
-                            botActions.clawActions.openClawAction()
-                    )
-                )*/
-        );
-
-
-
-        return  path1;
-    }
-
-    public SequentialAction createPath2(){
         return new SequentialAction(
-                drive.actionBuilder(new Pose2d(30.2,-15, Math.toRadians(0)))
-                    .splineToConstantHeading(new Vector2d(25,-15), Math.toRadians(0))
-                    .splineToConstantHeading(new Vector2d(15,33), Math.toRadians(200)).build(),
-                new InstantAction(() -> linearRail.moveRail(LinearRail.linearRailStates.intake))
-            )
-        ;}
-    public SequentialAction createPath3(){
-        return new SequentialAction(
-                drive.actionBuilder(new Pose2d(15,33, Math.toRadians(0)))
+            botActions.init(),
+            drive.actionBuilder(drive.pose)
+                .setTangent(Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(30.2,-15), Math.toRadians(0)).build(),
+            new SleepAction(.5),
+            botActions.slideActions.pullDownRungAction(),
+            new SleepAction(.3),
+            new SequentialAction(
+                drive.actionBuilder(new Pose2d(30.2,-15, Math.toRadians(180)))
+                    .splineToConstantHeading(new Vector2d(15,-15), Math.toRadians(180)).build(),
+                botActions.intake(),
+                drive.actionBuilder(new Pose2d(15,-15, Math.toRadians(180)))
+                    .splineToConstantHeading(new Vector2d(15,33), Math.toRadians(0)).build(),
+                botActions.clampSample()
+            ),
+            new SequentialAction(
+                new ParallelAction(
+                    drive.actionBuilder(new Pose2d(15,33, Math.toRadians(0)))
+                        .setTangent(Math.toRadians(0))
                         .splineToLinearHeading(new Pose2d(10,37,Math.toRadians(-45)), Math.toRadians(0))
                         .build(),
-                new SequentialAction(
                     botActions.outtakeHighBasket()
-                )
-            );}
+                ),
+                new SleepAction(1),
+                drive.actionBuilder(new Pose2d(10,37,Math.toRadians(-45)))
+                    .setTangent(Math.toRadians(180))
+                    .splineToLinearHeading(new Pose2d(7,40,Math.toRadians(-45)), Math.toRadians(180))
+                    .build(),
+                botActions.clawActions.openClawAction()
+            )
+        );
+    }
 
     public void updateTelemetry(){
         telemetry.addData("State", autoStates);
