@@ -20,7 +20,7 @@ public class VerticalSlides {
     public static double f = 0.1;
 
     public enum slideStates{
-        intake, lowBasket, highRung, highBasket
+        intake, lowBasket, highRung, highBasket, pullDown
     }
    public static int target =0;
     //p = 0.01 d = .001
@@ -119,11 +119,14 @@ public class VerticalSlides {
             case intake:
                 target=0;
                 break;
+            case pullDown:
+                target = 760;
+                break;
             case lowBasket:
                 target=200;
                 break;
             case highRung:
-                target=800;
+                target=810;
                 break;
             case highBasket:
                 target=1000;

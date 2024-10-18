@@ -7,6 +7,7 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.tel
 import com.acmerobotics.roadrunner.ftc.LazyImu;
 //import com.arcrobotics.ftclib.command.Subsystem;
 //import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -43,6 +44,8 @@ public class DriveTrain
         rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
         rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
 
+        rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         // this is making a new object called 'parameters' that we use to hold the angle the imu is at
         parameters = new BNO055IMU.Parameters();
@@ -51,27 +54,21 @@ public class DriveTrain
     }
 
 
-    public void fieldCentric(Gamepad driver, Telemetry tel){
-        y = driver.left_stick_y;
-        x = driver.left_stick_x;
-        rx = driver.right_stick_x;
-        botHeading = 0;
+    public void fieldCentric(GamepadEx driver, Telemetry tel){
+        double y = -driver.getLeftY();
+        double x = -driver.getLeftX();
+        double rx = -driver.getRightX();
 
-        tel.addData("H", botHeading);
-        tel.update();
-        rotX = x * Math.cos(botHeading) - y * Math.sin(botHeading);
-        rotY = x * Math.sin(botHeading) + y * Math.cos(botHeading);
-        denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+        double frontLeftPower = (y + x + rx) / denominator;
+        double backLeftPower = (y - x + rx) / denominator;
+        double frontRightPower = (y - x - rx) / denominator;
+        double backRightPower = (y + x - rx) / denominator;
 
-        frontLeftPower = 1 * (rotY + rotX + rx) / denominator;
-        backLeftPower = 1 * (rotY - rotX + rx) / denominator;
-        frontRightPower = 1 * (rotY - rotX - rx) / denominator;
-        backRightPower = 1 * (rotY + rotX - rx) / denominator;
-
-        leftFront.setPower(frontLeftPower*slow_mode);
-        leftBack.setPower(backLeftPower*slow_mode);
-        rightFront.setPower(frontRightPower*slow_mode);
-        rightBack.setPower(backRightPower*slow_mode);
+        leftFront.setPower(frontLeftPower);
+        leftBack.setPower(backLeftPower);
+        rightFront.setPower(frontRightPower);
+        rightBack.setPower(backRightPower);
     }
 
 

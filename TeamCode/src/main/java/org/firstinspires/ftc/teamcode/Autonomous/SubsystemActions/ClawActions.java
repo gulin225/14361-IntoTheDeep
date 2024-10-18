@@ -7,8 +7,6 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.Subsystems.Claw;
-
 public class ClawActions {
     private Claw claw;
     public ClawActions(HardwareMap hardwareMap){
@@ -59,7 +57,20 @@ public class ClawActions {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
-                claw.moveClaw(Claw.clawStates.intake);
+                claw.moveClaw(Claw.clawStates.intakeAuto);
+                initialized = true;
+            }
+
+            return true;
+        }
+    }
+    public class armFlatIntake implements Action {
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                claw.moveClaw(Claw.clawStates.intakeFlat);
                 initialized = true;
             }
 
@@ -118,6 +129,9 @@ public class ClawActions {
     }
     public Action armIntakeAction(){
         return new armIntake();
+    }
+    public Action armIntakeFlat(){
+        return new armFlatIntake();
     }
     public Action wristOn(){
         return new wristIntake();

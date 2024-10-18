@@ -29,7 +29,7 @@ public class Robot {
 
     public void intake(){
         linearRail.moveRail(LinearRail.linearRailStates.intake);
-        claw.moveClaw(Claw.clawStates.intake);
+        claw.moveClaw(Claw.clawStates.intakeFlat);
     }
 
     public void outtake(){

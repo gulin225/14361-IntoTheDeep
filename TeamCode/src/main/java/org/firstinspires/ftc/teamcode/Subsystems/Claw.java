@@ -5,15 +5,12 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.Autonomous.AutonomousTesting.AprilTagDrive;
-import org.firstinspires.ftc.teamcode.Autonomous.MecanumDrive;
-
 public class Claw {
     ColorSensor sensor;
     public Servo claw, leftArm, rightArm, wrist;
     public CRServo activeIntake;
     public enum clawStates{
-        spinOn, spinOff, open, close, intake, outtake, wristIntake, wristOuttake
+        spinOn, spinOff, open, close, intakeSubmersible, outtake, wristIntake, intakeFlat, intakeAuto
     }
     final double armOffset = .02;
     public Claw(HardwareMap hardwareMap){
@@ -38,9 +35,17 @@ public class Claw {
             case close:
                 claw.setPosition(.4);
                 break;
-            case intake:
+            case intakeSubmersible:
                 leftArm.setPosition(.32);
                 rightArm.setPosition(.32+armOffset);
+                break;
+            case intakeAuto:
+                leftArm.setPosition(.29);
+                rightArm.setPosition(.29+armOffset);
+                break;
+            case intakeFlat:
+                leftArm.setPosition(.4);
+                rightArm.setPosition(.4+armOffset);
                 break;
             case outtake:
                 leftArm.setPosition(.76);

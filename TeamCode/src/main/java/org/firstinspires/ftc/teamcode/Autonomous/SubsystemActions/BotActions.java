@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Autonomous.SubsystemActions;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Subsystems.LinearRail;
@@ -19,7 +20,10 @@ public class BotActions {
     }
 
     public ParallelAction outtakeHighRung(){
-       ParallelAction outtakingHighRung = new ParallelAction(linearRailActions.outtakeAction(), slideActions.highRungAction());
+       ParallelAction outtakingHighRung = new ParallelAction(
+               linearRailActions.outtakeAction(),
+               slideActions.highRungAction()
+       );
        return outtakingHighRung;
     }
 
@@ -35,13 +39,24 @@ public class BotActions {
     }
 
     public ParallelAction outtakeHighBasket(){
-        ParallelAction outtakingHighBasket = new ParallelAction(linearRailActions.outtakeAction(), slideActions.highBasketAction());
+        ParallelAction outtakingHighBasket = new ParallelAction(
+                linearRailActions.outtakeAction(),
+                slideActions.highBasketAction(),
+                clawActions.armOuttakeAction(),
+                clawActions.spinOffAction(),
+                clawActions.closeClawAction()
+        );
         return outtakingHighBasket;
     }
 
-    public ParallelAction intake(){
-        ParallelAction intake = new  ParallelAction(linearRailActions.intakeAction(), slideActions.intakeAction(), clawActions.openClawAction(), clawActions.armIntakeAction(), clawActions.spinOnAction());
-        return intake;
+    public SequentialAction intake(){
+        SequentialAction intakeAfterSpecimen = new SequentialAction(
+                slideActions.intakeAction(),
+                clawActions.openClawAction(),
+                clawActions.armIntakeFlat(),
+                clawActions.spinOnAction()
+        );
+        return intakeAfterSpecimen;
     }
 
 }

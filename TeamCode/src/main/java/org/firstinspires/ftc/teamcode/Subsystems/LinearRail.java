@@ -27,8 +27,7 @@ public class LinearRail {
                 linkage.setPosition(.63); //.63
                 break;
             case middle:
-                linearRail.setPosition(.4);
-                linkage.setPosition(.5);
+                linearRail.setPosition(.45);
                 break;
             case test:
                 linkage.setPosition(AprilTagDrive.PARAMS.kA);

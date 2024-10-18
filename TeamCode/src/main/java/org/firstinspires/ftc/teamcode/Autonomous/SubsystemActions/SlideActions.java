@@ -68,6 +68,19 @@ public class SlideActions {
             return true;
         }
     }
+    public class pullDownRung implements Action {
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                verticalSlides.setSlides(VerticalSlides.slideStates.pullDown);
+                initialized = true;
+            }
+
+            return true;
+        }
+    }
 
 //    public class slidePIDHighBasket implements Action{
 //        private boolean initialized = false;
@@ -99,6 +112,9 @@ public class SlideActions {
     }
     public Action intakeAction(){
         return new intake();
+    }
+    public Action pullDownRungAction(){
+        return new pullDownRung();
     }
     public Action PID() { return new PIDLoop(); }
 }
