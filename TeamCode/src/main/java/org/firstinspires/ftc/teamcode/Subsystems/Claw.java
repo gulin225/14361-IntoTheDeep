@@ -36,12 +36,12 @@ public class Claw {
                 claw.setPosition(.4);
                 break;
             case intakeSubmersible:
-                leftArm.setPosition(.32);
-                rightArm.setPosition(.32+armOffset);
+                leftArm.setPosition(.3);
+                rightArm.setPosition(.3+armOffset);
                 break;
             case intakeAuto:
-                leftArm.setPosition(.29);
-                rightArm.setPosition(.29+armOffset);
+                leftArm.setPosition(.32);
+                rightArm.setPosition(.32+armOffset);
                 break;
             case intakeFlat:
                 leftArm.setPosition(.4);

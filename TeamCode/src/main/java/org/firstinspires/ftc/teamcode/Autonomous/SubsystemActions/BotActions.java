@@ -32,8 +32,8 @@ public class BotActions {
                 clawActions.closeClawAction(),
                 slideActions.highRungAction(),
                 linearRailActions.outtakeAction(),
-                clawActions.armIntakeAction(),
-                clawActions.wristOn()
+                clawActions.wristOn(),
+                clawActions.ArmHighRung()
         );
         return init;
     }
@@ -49,6 +49,7 @@ public class BotActions {
 
     public ParallelAction intake(){
         ParallelAction intakeAfterSpecimen = new ParallelAction(
+                clawActions.armIntakeAction(),
                 slideActions.intakeAction(),
                 clawActions.openClawAction(),
                 linearRailActions.intakeAction(),

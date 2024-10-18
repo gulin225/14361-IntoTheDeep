@@ -64,6 +64,19 @@ public class ClawActions {
             return false;
         }
     }
+    public class armHighRung implements Action {
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                claw.moveClaw(Claw.clawStates.intakeFlat);
+                initialized = true;
+            }
+
+            return false;
+        }
+    }
     public class armFlatIntake implements Action {
         private boolean initialized = false;
 
@@ -130,8 +143,8 @@ public class ClawActions {
     public Action armIntakeAction(){
         return new armIntake();
     }
-    public Action armIntakeFlat(){
-        return new armFlatIntake();
+    public Action ArmHighRung(){
+        return new armHighRung();
     }
     public Action wristOn(){
         return new wristIntake();

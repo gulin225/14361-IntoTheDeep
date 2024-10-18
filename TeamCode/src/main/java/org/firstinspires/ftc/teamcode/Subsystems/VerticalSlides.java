@@ -120,13 +120,13 @@ public class VerticalSlides {
                 target=0;
                 break;
             case pullDown:
-                target = 760;
+                target = 490;
                 break;
             case lowBasket:
-                target=200;
+                target=125;
                 break;
             case highRung:
-                target=810;
+                target=690;
                 break;
             case highBasket:
                 target=1000;
