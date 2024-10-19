@@ -51,6 +51,19 @@ public class ClawActions {
             return false;
         }
     }
+    public class armSubmersible implements Action {
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                claw.moveClaw(Claw.clawStates.intakeSubmersible);
+                initialized = true;
+            }
+
+            return false;
+        }
+    }
     public class armIntake implements Action {
         private boolean initialized = false;
 
@@ -142,6 +155,9 @@ public class ClawActions {
     }
     public Action armIntakeAction(){
         return new armIntake();
+    }
+    public Action armSubmerisbleAction(){
+        return new armSubmersible();
     }
     public Action ArmHighRung(){
         return new armHighRung();

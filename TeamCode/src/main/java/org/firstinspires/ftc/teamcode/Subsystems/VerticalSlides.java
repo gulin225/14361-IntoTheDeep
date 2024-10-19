@@ -1,16 +1,10 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
-import android.sax.StartElementListener;
-
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
-import org.firstinspires.ftc.teamcode.Autonomous.AutonomousTesting.AprilTagDrive;
 
 public class VerticalSlides {
     private PIDController controllerUp, controllerDown;
@@ -20,7 +14,7 @@ public class VerticalSlides {
     public static double f = 0.1;
 
     public enum slideStates{
-        intake, lowBasket, highRung, highBasket, pullDown
+        intake, specimen, highRung, highBasket, pullDown, armDown
     }
    public static int target =0;
     //p = 0.01 d = .001
@@ -120,13 +114,16 @@ public class VerticalSlides {
                 target=0;
                 break;
             case pullDown:
-                target = 490;
+                target = 520;
                 break;
-            case lowBasket:
+            case specimen:
                 target=125;
                 break;
+            case armDown:
+                target=200;
+                break;
             case highRung:
-                target=690;
+                target=650;
                 break;
             case highBasket:
                 target=1000;

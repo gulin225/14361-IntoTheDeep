@@ -38,7 +38,9 @@ public class TeleOperation extends LinearOpMode {
                robot.linearRail.moveRail(LinearRail.linearRailStates.intake);
            }
            if (gamepad1.triangle) {
-               robot.linearRail.moveRail(LinearRail.linearRailStates.middle);
+               robot.verticalSlides.setSlides(VerticalSlides.slideStates.armDown);
+               robot.claw.moveClaw(Claw.clawStates.armDown);
+               robot.linearRail.moveRail(LinearRail.linearRailStates.intake);
            }
            if (gamepad1.circle) robot.outtake();
 
@@ -54,7 +56,7 @@ public class TeleOperation extends LinearOpMode {
            }
            if (gamepad1.dpad_left) {
                robot.intake();
-               robot.verticalSlides.setSlides(VerticalSlides.slideStates.lowBasket);
+               robot.verticalSlides.setSlides(VerticalSlides.slideStates.specimen);
            }
            if (gamepad1.dpad_up) {
                robot.intake();

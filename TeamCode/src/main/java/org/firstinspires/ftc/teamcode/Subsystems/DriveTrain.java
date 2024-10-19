@@ -62,7 +62,7 @@ public class DriveTrain
     public void fieldCentric(GamepadEx driver){
         double y = -driver.getLeftY(); // Remember, Y stick value is reversed
         double x = -driver.getLeftX();
-        double rx = -driver.getRightX();
+        double rx = -driver.getRightX()*.5;
 
         double botHeading = imu.getAngularOrientation().firstAngle;
 

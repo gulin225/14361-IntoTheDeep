@@ -47,6 +47,12 @@ public class BotActions {
         return outtakingHighBasket;
     }
 
+    public ParallelAction placeSpecimen(){
+        return new ParallelAction(
+                clawActions.armSubmerisbleAction(),
+                slideActions.pullDownRungAction()
+        );
+    }
     public ParallelAction intake(){
         ParallelAction intakeAfterSpecimen = new ParallelAction(
                 clawActions.armIntakeAction(),
