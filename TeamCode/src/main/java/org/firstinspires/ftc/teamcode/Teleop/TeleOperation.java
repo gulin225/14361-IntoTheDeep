@@ -69,7 +69,7 @@ public class TeleOperation extends LinearOpMode {
            }
 
            if (gamepad1.left_bumper) robot.claw.moveClaw(Claw.clawStates.open);
-           if (gamepad1.right_bumper) robot.claw.moveClaw(Claw.clawStates.close);
+           if (gamepad1.right_bumper) robot.claw.moveClaw(Claw.clawStates.teleopCloseClaw);
 
             telemetry.update();
        }

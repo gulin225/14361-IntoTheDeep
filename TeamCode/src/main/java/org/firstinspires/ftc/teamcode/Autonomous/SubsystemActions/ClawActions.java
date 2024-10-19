@@ -18,7 +18,7 @@ public class ClawActions {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
-                claw.moveClaw(Claw.clawStates.close);
+                claw.moveClaw(Claw.clawStates.autoCloseClaw);
                 initialized = true;
             }
 
