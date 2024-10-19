@@ -22,7 +22,7 @@ public class TeleOperation extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
        robot = new Robot(hardwareMap, telemetry);
         driver = new GamepadEx(gamepad2);
-        controller = new GamepadEx(gamepad2);
+        controller = new GamepadEx(gamepad1);
        waitForStart();
        robot.init();
 
@@ -33,6 +33,7 @@ public class TeleOperation extends LinearOpMode {
            robot.driveTrain.fieldCentric(driver);
            robot.verticalSlides.PIDLoop();
 
+           robot.verticalSlides.addTarget(-gamepad1.right_stick_y);
            if (gamepad1.square) {
                robot.claw.moveClaw(Claw.clawStates.intakeSubmersible);
                robot.linearRail.moveRail(LinearRail.linearRailStates.intake);

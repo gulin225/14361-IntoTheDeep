@@ -38,7 +38,7 @@ public class Claw {
                 claw.setPosition(.37);
                 break;
             case teleopCloseClaw:
-                claw.setPosition(.34);
+                claw.setPosition(.37);
                 break;
             case intakeSubmersible:
                 leftArm.setPosition(.3);

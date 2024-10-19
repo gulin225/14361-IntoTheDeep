@@ -131,12 +131,8 @@ public class VerticalSlides {
         }
     }
 
-    public void test(double one, double two, double three, double four){
-        backLeftSlide.setPower(one);
-        backRightSlidePID.setPower(two);
-        frontLeftSlide.setPower(three);
-        frontRightSlide.setPower(four);
-
+    public void addTarget(double addition){
+        target += addition;
     }
     public void setPowerZero(){
         backLeftSlide.setPower(0);

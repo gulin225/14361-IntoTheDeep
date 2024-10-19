@@ -103,23 +103,14 @@ public class BlueBucket extends LinearOpMode {
                 .build(),
             botActions.clawActions.openClawAction(),
             new SleepAction(.3),
+            botActions.clawActions.armIntakeAction(),
+            new SleepAction(.7),
+            botActions.intake(),
+            new SleepAction(.5),
             drive.actionBuilder(new Pose2d(4,43,Math.toRadians(-45)))
-                    .setTangent(Math.toRadians(180))
-                    .splineToLinearHeading(new Pose2d(10,40,Math.toRadians(0)), Math.toRadians(180))
-                    .build(),
-            botActions.slideActions.intakeAction(),
-            new SleepAction(1),
-            botActions.clawActions.ArmHighRung()
-            /*new ParallelAction(
-                new SequentialAction(
-                    new SleepAction(.5),
-                    botActions.intake()
-                ),
-                drive.actionBuilder(new Pose2d(4,43,Math.toRadians(-45)))
-                    .setTangent(Math.toRadians(0))
-                    .splineToLinearHeading(new Pose2d(15,46,Math.toRadians(0)), Math.toRadians(0))
-                    .build()
-            ),
+                .setTangent(Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(15,46,Math.toRadians(0)), Math.toRadians(0))
+                .build(),
             botActions.clampSample(),
             new ParallelAction(
                 drive.actionBuilder(new Pose2d(15,46,Math.toRadians(0)))
@@ -159,7 +150,51 @@ public class BlueBucket extends LinearOpMode {
                 .setTangent(Math.toRadians(180))
                 .splineToLinearHeading(new Pose2d(4,43,Math.toRadians(-45)), Math.toRadians(180))
                 .build(),
-            botActions.clawActions.openClawAction()*/
+            botActions.clawActions.openClawAction()
+        );
+    }
+
+    public SequentialAction oneSamplePath(){
+        return new SequentialAction(
+                botActions.init(),
+                drive.actionBuilder(drive.pose)
+                        .setTangent(Math.toRadians(0))
+                        .splineToConstantHeading(new Vector2d(27.5,-10), Math.toRadians(0)).build(),
+                new SleepAction(.5),
+                botActions.placeSpecimen(),
+                new SleepAction(.7),
+                botActions.clawActions.openClawAction(),
+                new ParallelAction(
+                        new SequentialAction(
+                                new SleepAction(.5),
+                                botActions.intake()
+                        ),
+                        drive.actionBuilder(new Pose2d(27.5,-10, Math.toRadians(0)))
+                                .setTangent(Math.toRadians(180))
+                                .splineToConstantHeading(new Vector2d(15,33), Math.toRadians(0)).build()
+                ),
+                botActions.clampSample(),
+                new ParallelAction(
+                        drive.actionBuilder(new Pose2d(15,33, Math.toRadians(0)))
+                                .setTangent(Math.toRadians(0))
+                                .splineToLinearHeading(new Pose2d(10,37,Math.toRadians(-45)), Math.toRadians(0))
+                                .build(),
+                        botActions.outtakeHighBasket()
+                ),
+                new SleepAction(.3),
+                drive.actionBuilder(new Pose2d(10,37,Math.toRadians(-45)))
+                        .setTangent(Math.toRadians(180))
+                        .splineToLinearHeading(new Pose2d(4,43,Math.toRadians(-45)), Math.toRadians(180))
+                        .build(),
+                botActions.clawActions.openClawAction(),
+                new SleepAction(.3),
+                drive.actionBuilder(new Pose2d(4,43,Math.toRadians(-45)))
+                        .setTangent(Math.toRadians(180))
+                        .splineToLinearHeading(new Pose2d(10,40,Math.toRadians(0)), Math.toRadians(180))
+                        .build(),
+                botActions.slideActions.intakeAction(),
+                new SleepAction(1),
+                botActions.clawActions.ArmHighRung()
         );
     }
 
