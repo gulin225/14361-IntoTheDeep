@@ -140,6 +140,10 @@ public class VerticalSlides {
         frontLeftSlide.setPower(0);
         frontRightSlide.setPower(0);
     }
+    public void resetEncoder(){
+        backRightSlidePID.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backRightSlidePID.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
 
     public int getTarget(){
         return target;

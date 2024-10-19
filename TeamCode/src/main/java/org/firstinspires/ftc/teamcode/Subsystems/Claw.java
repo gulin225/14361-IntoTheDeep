@@ -10,7 +10,7 @@ public class Claw {
     public Servo claw, leftArm, rightArm, wrist;
     public CRServo activeIntake;
     public enum clawStates{
-        spinOn, spinOff, open, autoCloseClaw, teleopCloseClaw, intakeSubmersible, outtake, wristIntake, intakeFlat, intakeAuto, armDown, spinReverse
+        spinOn, outtakeThirdSampleArm, depositClawThirdSample,openClawThirdSample, spinOff, open, autoCloseClaw, teleopCloseClaw, intakeSubmersible, outtake, wristIntake, intakeFlat, intakeAuto, armDown, spinReverse
     }
     final double armOffset = .02;
     public Claw(HardwareMap hardwareMap){
@@ -37,6 +37,12 @@ public class Claw {
             case autoCloseClaw:
                 claw.setPosition(.37);
                 break;
+            case depositClawThirdSample:
+                claw.setPosition(.15);
+                break;
+            case openClawThirdSample:
+                claw.setPosition(.25);
+                break;
             case teleopCloseClaw:
                 claw.setPosition(.37);
                 break;
@@ -55,6 +61,10 @@ public class Claw {
             case armDown:
                 leftArm.setPosition(.2);
                 rightArm.setPosition(.2+armOffset);
+                break;
+            case outtakeThirdSampleArm:
+                leftArm.setPosition(.52);
+                rightArm.setPosition(.52+armOffset);
                 break;
             case outtake:
                 leftArm.setPosition(.76);

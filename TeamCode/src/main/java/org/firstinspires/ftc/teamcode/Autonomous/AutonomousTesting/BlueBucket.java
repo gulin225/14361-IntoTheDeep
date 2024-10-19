@@ -86,28 +86,32 @@ public class BlueBucket extends LinearOpMode {
                 ),
                 drive.actionBuilder(new Pose2d(27.5,-10, Math.toRadians(0)))
                     .setTangent(Math.toRadians(180))
-                    .splineToConstantHeading(new Vector2d(15,33), Math.toRadians(0)).build()
+                    .splineToConstantHeading(new Vector2d(18,33), Math.toRadians(0)).build()
             ),
             botActions.clampSample(),
             new ParallelAction(
                 drive.actionBuilder(new Pose2d(15,33, Math.toRadians(0)))
                     .setTangent(Math.toRadians(0))
-                    .splineToLinearHeading(new Pose2d(10,37,Math.toRadians(-45)), Math.toRadians(0))
+                    .splineToLinearHeading(new Pose2d(13,34,Math.toRadians(-45)), Math.toRadians(0))
                     .build(),
                 botActions.outtakeHighBasket()
             ),
             new SleepAction(.3),
-            drive.actionBuilder(new Pose2d(10,37,Math.toRadians(-45)))
+            drive.actionBuilder(new Pose2d(13,34,Math.toRadians(-45)))
                 .setTangent(Math.toRadians(180))
                 .splineToLinearHeading(new Pose2d(4,43,Math.toRadians(-45)), Math.toRadians(180))
                 .build(),
             botActions.clawActions.openClawAction(),
             new SleepAction(.3),
-            botActions.clawActions.armIntakeAction(),
+            drive.actionBuilder(new Pose2d(4,43,Math.toRadians(-45)))
+                    .setTangent(Math.toRadians(0))
+                    .splineToLinearHeading(new Pose2d(10,46,Math.toRadians(0)), Math.toRadians(0))
+                    .build(),
+            botActions.slideActions.intakeAction(),
             new SleepAction(.7),
             botActions.intake(),
             new SleepAction(.5),
-            drive.actionBuilder(new Pose2d(4,43,Math.toRadians(-45)))
+            drive.actionBuilder(new Pose2d(10,46,Math.toRadians(0)))
                 .setTangent(Math.toRadians(0))
                 .splineToLinearHeading(new Pose2d(15,46,Math.toRadians(0)), Math.toRadians(0))
                 .build(),
@@ -115,49 +119,57 @@ public class BlueBucket extends LinearOpMode {
             new ParallelAction(
                 drive.actionBuilder(new Pose2d(15,46,Math.toRadians(0)))
                     .setTangent(Math.toRadians(0))
-                    .splineToLinearHeading(new Pose2d(10,35,Math.toRadians(-45)), Math.toRadians(0))
+                    .splineToLinearHeading(new Pose2d(12,32,Math.toRadians(-45)), Math.toRadians(0))
                     .build(),
                 botActions.outtakeHighBasket()
             ),
             new SleepAction(.3),
-            drive.actionBuilder(new Pose2d(10,35,Math.toRadians(-45)))
+            drive.actionBuilder(new Pose2d(12,32,Math.toRadians(-45)))
                 .setTangent(Math.toRadians(180))
                 .splineToLinearHeading(new Pose2d(4,43,Math.toRadians(-45)), Math.toRadians(180))
                 .build(),
             botActions.clawActions.openClawAction(),
             new SleepAction(.3),
-                drive.actionBuilder(new Pose2d(4,43,Math.toRadians(-45)))
-                        .setTangent(Math.toRadians(180))
-                        .splineToLinearHeading(new Pose2d(10,40,Math.toRadians(0)), Math.toRadians(180))
-                        .build(),
-                botActions.slideActions.intakeAction(),
-                new SleepAction(1),
-                botActions.clawActions.ArmHighRung()
-            /*new ParallelAction(
-                drive.actionBuilder(new Pose2d(4,43,Math.toRadians(-45)))
+            drive.actionBuilder(new Pose2d(4,43,Math.toRadians(-45)))
+                .setTangent(Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(10,40,Math.toRadians(0)), Math.toRadians(180))
+                .build(),
+            botActions.slideActions.intakeAction(),
+            new SleepAction(.7),
+            botActions.intake(),
+            drive.actionBuilder(new Pose2d(10,40,Math.toRadians(0)))
                     .setTangent(Math.toRadians(270))
                     .splineToSplineHeading(new Pose2d(36,28,Math.toRadians(90)), Math.toRadians(90))
                     .splineToConstantHeading(new Vector2d(36,34), Math.toRadians(90))
                     .build(),
-                new SequentialAction(
-                    new SleepAction(.5),
-                    botActions.intake()
-                )
+            new SequentialAction(
+                    botActions.clawActions.closeClawAction(),
+                    new SleepAction(.3),
+                    botActions.clawActions.spinOffAction()
             ),
-            botActions.clampSample(),
             new ParallelAction(
                 drive.actionBuilder(new Pose2d(36,34,Math.toRadians(90)))
                     .setTangent(Math.toRadians(270))
-                    .splineToLinearHeading(new Pose2d(10,37,Math.toRadians(-45)), Math.toRadians(90))
+                    .splineToLinearHeading(new Pose2d(19,35,Math.toRadians(135)), Math.toRadians(90))
                     .build(),
-                botActions.outtakeHighBasket()
+                botActions.slideActions.highBasketAction(),
+                botActions.clawActions.thirdSampleArmOuttakeAction()
             ),
             new SleepAction(.3),
-            drive.actionBuilder(new Pose2d(10,37,Math.toRadians(-45)))
+            drive.actionBuilder(new Pose2d(19,35,Math.toRadians(135)))
                 .setTangent(Math.toRadians(180))
-                .splineToLinearHeading(new Pose2d(4,43,Math.toRadians(-45)), Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(17,37,Math.toRadians(135)), Math.toRadians(180))
                 .build(),
-            botActions.clawActions.openClawAction()*/
+            botActions.clawActions.openClawThirdSampleAction(),
+            new SleepAction(.3),
+            drive.actionBuilder(new Pose2d(17,37,Math.toRadians(135)))
+                    .setTangent(Math.toRadians(180))
+                    .splineToLinearHeading(new Pose2d(10,37,Math.toRadians(0)), Math.toRadians(180))
+                    .build(),
+            botActions.slideActions.intakeAction(),
+            botActions.clawActions.closeClawAction(),
+            new SleepAction(.7),
+            botActions.clawActions.ArmHighRung()
         );
     }
 

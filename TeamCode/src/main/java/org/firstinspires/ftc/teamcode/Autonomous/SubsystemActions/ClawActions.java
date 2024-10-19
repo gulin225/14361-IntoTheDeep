@@ -116,6 +116,19 @@ public class ClawActions {
             return false;
         }
     }
+    public class openClawThirdSample implements Action {
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                claw.moveClaw(Claw.clawStates.depositClawThirdSample);
+                initialized = true;
+            }
+
+            return false;
+        }
+    }
     public class spinOn implements Action {
         private boolean initialized = false;
 
@@ -136,6 +149,32 @@ public class ClawActions {
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
                 claw.moveClaw(Claw.clawStates.spinOff);
+                initialized = true;
+            }
+
+            return false;
+        }
+    }
+    public class spinReverse implements Action {
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                claw.moveClaw(Claw.clawStates.spinReverse);
+                initialized = true;
+            }
+
+            return false;
+        }
+    }
+    public class thirdSampleArmOuttake implements Action {
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                claw.moveClaw(Claw.clawStates.outtakeThirdSampleArm);
                 initialized = true;
             }
 
@@ -171,5 +210,10 @@ public class ClawActions {
     public Action spinOffAction(){
         return new spinOff();
     }
+    public Action spinReverseAction(){
+        return new spinOff();
+    }
+    public Action openClawThirdSampleAction(){ return new openClawThirdSample(); }
+    public Action thirdSampleArmOuttakeAction(){ return new thirdSampleArmOuttake(); }
 
 }

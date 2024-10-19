@@ -34,6 +34,8 @@ public class TeleOperation extends LinearOpMode {
            robot.verticalSlides.PIDLoop();
 
            robot.verticalSlides.addTarget(-gamepad1.right_stick_y);
+
+           if (gamepad2.square) robot.verticalSlides.resetEncoder();
            if (gamepad1.square) {
                robot.claw.moveClaw(Claw.clawStates.intakeSubmersible);
                robot.linearRail.moveRail(LinearRail.linearRailStates.intake);
