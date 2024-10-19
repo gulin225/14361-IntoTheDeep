@@ -44,7 +44,8 @@ public class TeleOperation extends LinearOpMode {
            }
            if (gamepad1.circle) robot.outtake();
 
-           if((gamepad1.right_trigger > .2)) robot.claw.moveClaw(Claw.clawStates.spinOn);
+           if (gamepad1.right_trigger > .2) robot.claw.moveClaw(Claw.clawStates.spinOn);
+           else if (gamepad1.left_trigger > .2) robot.claw.moveClaw(Claw.clawStates.spinReverse);
            else  robot.claw.moveClaw(Claw.clawStates.spinOff);
            if(gamepad2.b) {
                 robot.claw.moveClaw(Claw.clawStates.outtake);

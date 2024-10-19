@@ -120,7 +120,7 @@ public class VerticalSlides {
                 target=125;
                 break;
             case armDown:
-                target=200;
+                target=225;
                 break;
             case highRung:
                 target=650;

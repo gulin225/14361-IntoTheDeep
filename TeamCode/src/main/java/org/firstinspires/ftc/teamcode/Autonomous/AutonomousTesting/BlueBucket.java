@@ -86,9 +86,9 @@ public class BlueBucket extends LinearOpMode {
                 ),
                 drive.actionBuilder(new Pose2d(27.5,-10, Math.toRadians(0)))
                     .setTangent(Math.toRadians(180))
-                    .splineToConstantHeading(new Vector2d(15,33), Math.toRadians(0)).build(),
-                botActions.clampSample()
+                    .splineToConstantHeading(new Vector2d(15,33), Math.toRadians(0)).build()
             ),
+            botActions.clampSample(),
             new ParallelAction(
                 drive.actionBuilder(new Pose2d(15,33, Math.toRadians(0)))
                     .setTangent(Math.toRadians(0))
@@ -103,7 +103,14 @@ public class BlueBucket extends LinearOpMode {
                 .build(),
             botActions.clawActions.openClawAction(),
             new SleepAction(.3),
-            new ParallelAction(
+            drive.actionBuilder(new Pose2d(4,43,Math.toRadians(-45)))
+                    .setTangent(Math.toRadians(180))
+                    .splineToLinearHeading(new Pose2d(10,40,Math.toRadians(0)), Math.toRadians(180))
+                    .build(),
+            botActions.slideActions.intakeAction(),
+            new SleepAction(1),
+            botActions.clawActions.ArmHighRung()
+            /*new ParallelAction(
                 new SequentialAction(
                     new SleepAction(.5),
                     botActions.intake()
@@ -152,7 +159,7 @@ public class BlueBucket extends LinearOpMode {
                 .setTangent(Math.toRadians(180))
                 .splineToLinearHeading(new Pose2d(4,43,Math.toRadians(-45)), Math.toRadians(180))
                 .build(),
-            botActions.clawActions.openClawAction()
+            botActions.clawActions.openClawAction()*/
         );
     }
 
