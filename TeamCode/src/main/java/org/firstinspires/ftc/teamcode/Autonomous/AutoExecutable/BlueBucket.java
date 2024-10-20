@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.LinearRail;
 @Autonomous(name = "Bucket", group = "Autonomous")
 public class BlueBucket extends LinearOpMode {
 
-    AutoStates autoStates = state1;
+    AutoStates autoStates = followingPath;
     BotActions botActions;
     PinpointDrive drive;
     final Pose2d startPose = new Pose2d(0,0, Math.toRadians(0));
@@ -50,7 +50,7 @@ public class BlueBucket extends LinearOpMode {
             verticalSlidePID = botActions.slideActions.PID();
 
             switch (autoStates){
-                case state1:
+                case followingPath:
                     running = path.run(tel);
                     if (!running) autoStates = AutoStates.idle;
                     break;
@@ -65,7 +65,7 @@ public class BlueBucket extends LinearOpMode {
 
     public SequentialAction createPath(){
         return new SequentialAction(
-                preloadSpecimen(), sample1(),sample2(),sample3()
+                preloadSpecimen(), sample1(), sample2(), sample3()
         );
     }
 
