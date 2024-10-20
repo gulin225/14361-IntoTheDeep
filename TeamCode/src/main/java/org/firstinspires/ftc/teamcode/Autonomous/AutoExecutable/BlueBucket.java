@@ -1,12 +1,11 @@
 
-package org.firstinspires.ftc.teamcode.Autonomous.AutonomousTesting;
+package org.firstinspires.ftc.teamcode.Autonomous.AutoExecutable;
 
-import static org.firstinspires.ftc.teamcode.Autonomous.AutonomousTesting.AutoStates.*;
+import static org.firstinspires.ftc.teamcode.Autonomous.AutoExecutable.AutoStates.*;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -15,14 +14,12 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.Autonomous.PinpointDrive;
+import org.firstinspires.ftc.teamcode.Autonomous.RRdrives.PinpointDrive;
 import org.firstinspires.ftc.teamcode.Autonomous.SubsystemActions.BotActions;
-import org.firstinspires.ftc.teamcode.Autonomous.SubsystemActions.ClawActions;
 import org.firstinspires.ftc.teamcode.Subsystems.LinearRail;
-import org.firstinspires.ftc.teamcode.Subsystems.Robot;
 
 @Config
-@Autonomous(name = "BlueBucket", group = "Autonomous")
+@Autonomous(name = "Bucket", group = "Autonomous")
 public class BlueBucket extends LinearOpMode {
 
     AutoStates autoStates = state1;

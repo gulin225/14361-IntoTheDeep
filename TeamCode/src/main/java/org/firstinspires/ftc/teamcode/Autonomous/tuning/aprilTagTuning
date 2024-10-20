@@ -1,0 +1,132 @@
+package org.firstinspires.ftc.teamcode.Autonomous.tuning;
+
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.Pose2d;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.teamcode.Subsystems.Limelight;
+
+import java.util.ArrayList;
+
+
+@Config
+@TeleOp(name = "tune april tag")
+public class aprilTagTuning extends LinearOpMode {
+    public enum states{
+        cX, cY
+    }
+    double intercept, slope;
+    double r2;
+    ArrayList<Double> X = new ArrayList<>();
+    ArrayList<Double> linearRegX = new ArrayList<>();
+    ArrayList<Double> linearRegY = new ArrayList<>();
+    double currentPos = 10;
+    Limelight limelight;
+    final double cameraPlacementX = 7.5;
+    final double cameraPlacementY = 0;
+    final double cameraAngle = Math.atan(cameraPlacementY/cameraPlacementX);
+    final double botCenterHypotenuse = Math.sqrt(Math.pow(cameraPlacementX,2) + Math.pow(cameraPlacementY,2));
+    double currentCamY, currentCamX;
+    states tuneValue = states.cX;
+    ElapsedTime timer = new ElapsedTime();
+    boolean averaging_values = false;
+    double totalRecordedValues = 0;
+    int numRecordedValues = 0;
+    @Override
+    public void runOpMode() throws InterruptedException {
+        limelight = new Limelight(hardwareMap, telemetry);
+        currentPos = (tuneValue == states.cX) ? -15: 10;
+
+        waitForStart();
+
+        while (!gamepad1.left_bumper){
+            testAprilTag();
+
+            if (gamepad2.right_bumper || averaging_values){
+                timer.reset();
+                totalRecordedValues += currentCamX;
+                numRecordedValues += 1;
+                averaging_values = true;
+                telemetry.addLine("Averaging values");
+
+                if (timer.seconds() > 2){
+                    double averageValue = totalRecordedValues/numRecordedValues;
+
+                    linearRegX.add(averageValue);
+                    linearRegY.add(currentPos);
+
+                    totalRecordedValues = 0;
+                    numRecordedValues = 0;
+                    currentPos += 2;
+                    averaging_values = false;
+                }
+            }
+
+            telemetry.addData("Position", currentPos);
+            telemetry.update();
+        }
+        double[] xArray = new double[linearRegX.size()];
+        double[] yArray = new double[linearRegY.size()];
+        for (int i = 0 ; i < linearRegX.size(); i++) xArray[i] = linearRegX.get(i);
+        for (int i = 0 ; i < linearRegY.size(); i++) yArray[i] = linearRegY.get(i);
+        aprilTagLinearRegression(xArray,yArray);
+
+        while (!gamepad1.right_bumper){
+            telemetry.addData("Calculated slope", slope);
+            telemetry.addData("Calculated intercept", intercept);
+            telemetry.update();
+        }
+
+    }
+    public void aprilTagLinearRegression(double[] x, double[] y) {
+        if (x.length != y.length) {
+            throw new IllegalArgumentException("array lengths are not equal");
+        }
+        int n = x.length;
+
+        // first pass
+        double sumx = 0.0, sumy = 0.0, sumx2 = 0.0;
+        for (int i = 0; i < n; i++) {
+            sumx  += x[i];
+            sumx2 += x[i]*x[i];
+            sumy  += y[i];
+        }
+        double xbar = sumx / n;
+        double ybar = sumy / n;
+
+        // second pass: compute summary statistics
+        double xxbar = 0.0, yybar = 0.0, xybar = 0.0;
+        for (int i = 0; i < n; i++) {
+            xxbar += (x[i] - xbar) * (x[i] - xbar);
+            yybar += (y[i] - ybar) * (y[i] - ybar);
+            xybar += (x[i] - xbar) * (y[i] - ybar);
+        }
+        slope  = xybar / xxbar;
+        intercept = ybar - slope * xbar;
+    }
+    public Pose2d testAprilTag() {
+        double heading = 0;
+        limelight.limelight.updateRobotOrientation(heading);
+        Pose3D botpose = limelight.getLatestPosition(telemetry);
+
+        Pose2d newPose = null;
+        if (botpose != null) {
+            double cameraX = (botpose.getPosition().x - 1.8002) / 0.04203;
+            double cameraY = ((botpose.getPosition().y * 39.37) + 47.3044) / 1.65203;
+
+            //if camera has y displacement from origin
+            double relativeBotX = Math.cos(Math.toRadians(heading) + cameraAngle) * botCenterHypotenuse;
+            double relativeBotY = Math.sin(Math.toRadians(heading) + cameraAngle) * botCenterHypotenuse;
+
+            double absoluteBotX = cameraX - relativeBotX;
+            double absoluteBotY = cameraY - relativeBotY;
+
+            currentCamY = cameraY;
+            currentCamX = cameraX;
+        }
+        return newPose;
+    }
+}
