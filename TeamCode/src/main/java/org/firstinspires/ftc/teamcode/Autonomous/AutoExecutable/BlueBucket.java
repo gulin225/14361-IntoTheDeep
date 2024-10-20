@@ -27,7 +27,7 @@ public class BlueBucket extends LinearOpMode {
     PinpointDrive drive;
     final Pose2d startPose = new Pose2d(0,0, Math.toRadians(0));
     TelemetryPacket tel = new TelemetryPacket();
-    Action SlidePIDLoop;
+    Action verticalSlidePID;
     SequentialAction path;
     boolean running;
     LinearRail linearRail;
@@ -47,7 +47,7 @@ public class BlueBucket extends LinearOpMode {
         path = createPath();
 
         while (!isStopRequested() && opModeIsActive()) {
-            SlidePIDLoop = botActions.slideActions.PID();
+            verticalSlidePID = botActions.slideActions.PID();
 
             switch (autoStates){
                 case state1:
@@ -58,7 +58,7 @@ public class BlueBucket extends LinearOpMode {
                     break;
             }
 
-            SlidePIDLoop.run(tel);
+            verticalSlidePID.run(tel);
             func.updateTelemetry(autoStates);
         }
     }
@@ -91,7 +91,7 @@ public class BlueBucket extends LinearOpMode {
             ),
             botActions.clampSample(),
             new ParallelAction(
-                    func.createSingleSpline(P2D(15,33,0), P2D(13,34,-45), 0, 0),
+                    func.createSingleSpline(P2D(18,33,0), P2D(13,34,-45), 0, 0),
                     botActions.outtakeHighBasket()
             ),
             new SleepAction(.3),
