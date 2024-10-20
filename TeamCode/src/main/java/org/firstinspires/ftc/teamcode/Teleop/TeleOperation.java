@@ -31,9 +31,9 @@ public class TeleOperation extends LinearOpMode {
            controller.readButtons();
 
            robot.driveTrain.fieldCentric(driver);
-           robot.verticalSlides.PIDLoop();
+         //  robot.verticalSlides.PIDLoop();
 
-           robot.verticalSlides.addTarget(-gamepad1.right_stick_y);
+        //   robot.verticalSlides.addTarget(-gamepad1.right_stick_y);
 
            if (gamepad2.square) robot.verticalSlides.resetEncoder();
            if (gamepad1.square) {
@@ -41,10 +41,10 @@ public class TeleOperation extends LinearOpMode {
                robot.linearRail.moveRail(LinearRail.linearRailStates.intake);
            }
            if (gamepad1.triangle) {
-               robot.verticalSlides.setSlides(VerticalSlides.slideStates.armDown);
+            //   robot.verticalSlides.setSlides(VerticalSlides.slideStates.armDown);
                robot.claw.moveClaw(Claw.clawStates.armDown);
                robot.linearRail.moveRail(LinearRail.linearRailStates.intake);
-           }
+           }"+"
            if (gamepad1.circle) robot.outtake();
 
            if (gamepad1.right_trigger > .2) robot.claw.moveClaw(Claw.clawStates.spinOn);
@@ -56,19 +56,19 @@ public class TeleOperation extends LinearOpMode {
             }
            if (gamepad1.dpad_down) {
                robot.intake();
-               robot.verticalSlides.setSlides(VerticalSlides.slideStates.intake);
+             //  robot.verticalSlides.setSlides(VerticalSlides.slideStates.intake);
            }
            if (gamepad1.dpad_left) {
                robot.intake();
-               robot.verticalSlides.setSlides(VerticalSlides.slideStates.specimen);
+            //  robot.verticalSlides.setSlides(VerticalSlides.slideStates.specimen);
            }
            if (gamepad1.dpad_up) {
                robot.intake();
-               robot.verticalSlides.setSlides(VerticalSlides.slideStates.highRung);
+             // robot.verticalSlides.setSlides(VerticalSlides.slideStates.highRung);
            }
            if (gamepad1.dpad_right) {
                robot.outtake();
-               robot.verticalSlides.setSlides(VerticalSlides.slideStates.highBasket);
+            //   robot.verticalSlides.setSlides(VerticalSlides.slideStates.highBasket);
            }
 
            if (gamepad1.left_bumper) robot.claw.moveClaw(Claw.clawStates.open);
