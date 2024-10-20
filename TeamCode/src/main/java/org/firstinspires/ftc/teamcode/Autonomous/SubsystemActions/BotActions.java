@@ -1,12 +1,9 @@
 package org.firstinspires.ftc.teamcode.Autonomous.SubsystemActions;
 
-import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
-import org.firstinspires.ftc.teamcode.Subsystems.LinearRail;
 
 public class BotActions {
     public ClawActions clawActions;
@@ -20,56 +17,55 @@ public class BotActions {
     }
 
     public ParallelAction outtakeHighRung(){
-       ParallelAction outtakingHighRung = new ParallelAction(
-               linearRailActions.outtakeAction(),
-               slideActions.highRungAction()
+        return new ParallelAction(
+           linearRailActions.outtakeAction(),
+           slideActions.highRungAction()
        );
-       return outtakingHighRung;
     }
 
     public ParallelAction init(){
-        ParallelAction init = new ParallelAction(
-                clawActions.closeClawAction(),
-                slideActions.highRungAction(),
-                linearRailActions.outtakeAction(),
-                clawActions.wristOn(),
-                clawActions.ArmHighRung()
+        return new ParallelAction(
+            clawActions.closeClawAction(),
+            clawActions.wristOn(),
+            clawActions.ArmHighRung()
         );
-        return init;
+    }
+    public ParallelAction start(){
+        return new ParallelAction(
+            slideActions.highRungAction(),
+            linearRailActions.outtakeAction()
+        );
     }
 
     public ParallelAction outtakeHighBasket(){
-        ParallelAction outtakingHighBasket = new ParallelAction(
-                linearRailActions.outtakeAction(),
-                slideActions.highBasketAction(),
-                clawActions.armOuttakeAction()
+        return new ParallelAction(
+            linearRailActions.outtakeAction(),
+            slideActions.highBasketAction(),
+            clawActions.armOuttakeAction()
         );
-        return outtakingHighBasket;
     }
 
     public ParallelAction placeSpecimen(){
         return new ParallelAction(
-                clawActions.armSubmerisbleAction(),
-                slideActions.pullDownRungAction()
+            clawActions.armSubmerisbleAction(),
+            slideActions.pullDownRungAction()
         );
     }
     public ParallelAction intake(){
-        ParallelAction intakeAfterSpecimen = new ParallelAction(
-                clawActions.armIntakeAction(),
-                slideActions.intakeAction(),
-                clawActions.openClawAction(),
-                linearRailActions.intakeAction(),
-                clawActions.spinOnAction()
+        return new ParallelAction(
+            clawActions.armIntakeAction(),
+            slideActions.intakeAction(),
+            clawActions.openClawAction(),
+            linearRailActions.intakeAction(),
+            clawActions.spinOnAction()
         );
-        return intakeAfterSpecimen;
     }
     public SequentialAction clampSample(){
-        SequentialAction clampSample = new SequentialAction(
-                clawActions.closeClawAction(),
-                new SleepAction(.3),
-                clawActions.spinOffAction()
+        return new SequentialAction(
+            clawActions.closeClawAction(),
+            new SleepAction(.3),
+            clawActions.spinOffAction()
         );
-        return clampSample;
     }
 
 }
