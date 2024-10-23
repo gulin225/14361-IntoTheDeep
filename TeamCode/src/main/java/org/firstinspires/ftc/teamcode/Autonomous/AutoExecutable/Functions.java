@@ -18,7 +18,9 @@ public class Functions {
   public void updateTelemetry(AutoStates state){
     //shorter telemetry
     telemetry.addData("State", state);
-    telemetry.addLine(drive.pose.toString());
+    telemetry.addData("x", drive.pose.position.x);
+    telemetry.addData("y", drive.pose.position.y);
+    telemetry.addData("h", Math.toRadians(drive.pose.heading.toDouble()));
     telemetry.update();
   }
 

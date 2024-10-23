@@ -22,7 +22,7 @@ public class PinpointDrive extends MecanumDrive {
     public static Params PARAMS = new Params();
     public GoBildaPinpointDriverRR pinpoint;
     private Pose2d lastPinpointPose = pose;
-    Limelight limelight;
+    public Limelight limelight;
     public PinpointDrive(HardwareMap hardwareMap, Pose2d pose, Limelight.corners corner) {
         super(hardwareMap, pose);
         leftBack.setDirection(DcMotorSimple.Direction.REVERSE);

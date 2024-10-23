@@ -24,7 +24,11 @@ public class Limelight {
     public enum corners{
         blueBucket, blueSpecimen, redBucket, redSpecimen
     }
-    corners corner;
+    public enum cameraModes{
+        close, far
+    }
+    public corners corner;
+    public cameraModes zoom = cameraModes.close;
 
     public Limelight(HardwareMap hardwareMap, corners c){
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
@@ -37,7 +41,7 @@ public class Limelight {
                 targetAprilTag = new Vector2d(20,40);
                 break;
             case blueSpecimen:
-                targetAprilTag = new Vector2d(20,-40);
+                targetAprilTag = new Vector2d(23.5,-47.5);
                 break;
         }
     }
@@ -51,8 +55,17 @@ public class Limelight {
         if (!result.getFiducialResults().isEmpty()) {
             Pose3D rawPose = result.getBotpose_MT2();
 
-            double cameraY = -((rawPose.getPosition().x - 1.8002) / 0.04203)-85;
-            double cameraX = (((rawPose.getPosition().y * 39.37) + 47.3044) / 1.65203)-58;
+            double cameraX = 0, cameraY = 0;
+            switch (zoom){
+                case close:
+                    cameraY = -((rawPose.getPosition().x - 1.8002) / 0.04203)-85;
+                    cameraX = (((rawPose.getPosition().y * 39.37) + 47.3044) / 1.65203)-58;
+                    break;
+                case far:
+                    cameraY = (rawPose.getPosition().y*39.37)*-1.99415 + 87.7902;
+                    cameraX = (rawPose.getPosition().x*39.37)*-1.96417-135.804;
+                    break;
+            }
 
             double relativeBotX = Math.cos(Math.toRadians(heading) + cameraAngle) * botCenterHypotenuse;
             double relativeBotY = Math.sin(Math.toRadians(heading) + cameraAngle) * botCenterHypotenuse;
@@ -64,7 +77,7 @@ public class Limelight {
                     absoluteBotY = cameraY + relativeBotY;
                     break;
                 case blueSpecimen:
-                    absoluteBotY = cameraY - relativeBotY;
+                    absoluteBotY = cameraY + relativeBotY;
                     break;
             }
 
@@ -77,16 +90,25 @@ public class Limelight {
                             targetAprilTag.x + distanceFromTag.position.x,
                             targetAprilTag.y - distanceFromTag.position.y);
                     break;
+                case blueSpecimen:
+                    botPos = new Vector2d(
+                            targetAprilTag.x + distanceFromTag.position.x,
+                            targetAprilTag.y + distanceFromTag.position.y);
+                    break;
             }
 
 
-            weightedPose = new Pose2d(
-                    (botPos.x + pinpointPose.position.x)/2,
-                    (botPos.y + pinpointPose.position.y)/2,
-                    heading
-            );
+            weightedPose = new Pose2d(botPos, Math.toRadians(heading));
         };
         return weightedPose;
     }
 
+    public void zoomIn(){
+        limelight.pipelineSwitch(0);
+        zoom = cameraModes.close;
+    }
+    public void zoomOut(){
+        limelight.pipelineSwitch(1);
+        zoom = cameraModes.far;
+    }
 }

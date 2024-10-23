@@ -32,6 +32,12 @@ public class localization extends LinearOpMode {
                     -gamepad1.right_stick_x
             ));
 
+            if (gamepad1.left_bumper){
+                drive.limelight.zoomIn();
+            }
+            if (gamepad1.right_bumper){
+                drive.limelight.zoomOut();
+            }
             drive.updatePoseEstimate();
             telemetry.addData("x", drive.pose.position.x);
             telemetry.addData("y", drive.pose.position.y);
