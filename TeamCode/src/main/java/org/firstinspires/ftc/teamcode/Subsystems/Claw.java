@@ -7,14 +7,14 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Claw {
     ColorSensor sensor;
-    public Servo claw, leftArm, rightArm, wrist;
+    public Servo grabber, leftArm, rightArm, wrist;
     public CRServo activeIntake;
     public enum clawStates{
-        spinOn, outtakeThirdSampleArm, depositClawThirdSample,openClawThirdSample, spinOff, open, autoCloseClaw, teleopCloseClaw, intakeSubmersible, outtake, wristIntake, intakeFlat, intakeAuto, armDown, spinReverse
+        spinOn, outtakeThirdSampleArm, depositClawThirdSample,openClawThirdSample, spinOff, open, autoCloseClaw, close, intakeSubmersible, outtake, wristIntake, intakeFlat, intakeAuto, armDown, spinReverse
     }
     final double armOffset = .02;
     public Claw(HardwareMap hardwareMap){
-        claw = hardwareMap.servo.get("claw");
+        grabber = hardwareMap.servo.get("claw");
         activeIntake = hardwareMap.crservo.get("activeIntake");
         wrist = hardwareMap.servo.get("wrist");
         leftArm = hardwareMap.servo.get("leftArm");
@@ -32,19 +32,19 @@ public class Claw {
             case spinReverse:
                 activeIntake.setPower(1);
             case open:
-                claw.setPosition(.21);
+                grabber.setPosition(.21);
                 break;
             case autoCloseClaw:
-                claw.setPosition(.37);
+                grabber.setPosition(.37);
                 break;
             case depositClawThirdSample:
-                claw.setPosition(.15);
+                grabber.setPosition(.15);
                 break;
             case openClawThirdSample:
-                claw.setPosition(.25);
+                grabber.setPosition(.25);
                 break;
-            case teleopCloseClaw:
-                claw.setPosition(.37);
+            case close:
+                grabber.setPosition(.37);
                 break;
             case intakeSubmersible:
                 leftArm.setPosition(.3);

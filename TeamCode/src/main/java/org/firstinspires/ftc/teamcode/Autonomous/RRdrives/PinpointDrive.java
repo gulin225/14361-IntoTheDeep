@@ -1,7 +1,4 @@
 package org.firstinspires.ftc.teamcode.Autonomous.RRdrives;
-
-
-
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -21,13 +18,6 @@ import org.firstinspires.ftc.teamcode.Autonomous.RRdrives.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Autonomous.messages.PoseMessage;
 import org.firstinspires.ftc.teamcode.Subsystems.Limelight;
 
-/**
- * Experimental extension of MecanumDrive that uses the Gobilda Pinpoint sensor for localization.
- * <p>
- * Released under the BSD 3-Clause Clear License by j5155 from 12087 Capital City Dynamics
- * Portions of this code made and released under the MIT License by Gobilda (Base 10 Assets, LLC)
- * Unless otherwise noted, comments are from Gobilda
- */
 public class PinpointDrive extends MecanumDrive {
     public static class Params {
         public double xOffset = -7.58;
@@ -82,23 +72,4 @@ public class PinpointDrive extends MecanumDrive {
 
         return pinpoint.getVelocityRR();
     }
-
-
-    // for debug logging
-    public static final class FTCPoseMessage {
-        public long timestamp;
-        public double x;
-        public double y;
-        public double heading;
-
-        public FTCPoseMessage(Pose2D pose) {
-            this.timestamp = System.nanoTime();
-            this.x = pose.getX(DistanceUnit.INCH);
-            this.y = pose.getY(DistanceUnit.INCH);
-            this.heading = pose.getHeading(AngleUnit.RADIANS);
-        }
-    }
-
-
-
 }

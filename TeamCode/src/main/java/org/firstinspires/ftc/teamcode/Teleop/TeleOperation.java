@@ -19,9 +19,13 @@ import org.firstinspires.ftc.teamcode.Subsystems.VerticalSlides;
 public class TeleOperation extends LinearOpMode {
     Robot robot;
     private GamepadEx driver, controller;
-    double total = 0;
     PinpointDrive drive;
     Pose2d start = new Pose2d(0,0,0);
+    public enum states{
+        outtakingSpecimen, outtakingBucket, drivingToSubmersible, intaking, intakeSpecimen
+    }
+    states currentState = states.intaking;
+    states switchState = null;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -29,64 +33,50 @@ public class TeleOperation extends LinearOpMode {
        robot = new Robot(hardwareMap, telemetry);
        driver = new GamepadEx(gamepad2);
        controller = new GamepadEx(gamepad1);
+
        waitForStart();
+
        robot.init();
 
        while (!isStopRequested() && opModeIsActive()){
            driver.readButtons();
            controller.readButtons();
-
            robot.driveTrain.fieldCentric(driver);
            robot.verticalSlides.PIDLoop();
-
-           robot.verticalSlides.addTarget(-gamepad1.right_stick_y);
-
            if (gamepad2.square) robot.verticalSlides.resetEncoder();
-           if (gamepad1.square) {
-               robot.claw.moveClaw(Claw.clawStates.intakeSubmersible);
-               robot.linearRail.moveRail(LinearRail.linearRailStates.intake);
-           }
-           if (gamepad1.triangle) {
-               robot.verticalSlides.setSlides(VerticalSlides.slideStates.armDown);
-               robot.claw.moveClaw(Claw.clawStates.armDown);
-               robot.linearRail.moveRail(LinearRail.linearRailStates.intake);
-           }
-           if (gamepad1.circle) robot.outtake();
 
-           if (gamepad1.right_trigger > .2) robot.claw.moveClaw(Claw.clawStates.spinOn);
-           else  robot.claw.moveClaw(Claw.clawStates.spinOff);
-           if(gamepad2.b) {
-                robot.claw.moveClaw(Claw.clawStates.outtake);
-                robot.claw.moveClaw(Claw.clawStates.spinOff);
-            }
-           if (gamepad1.dpad_down) {
-               robot.intake();
-               robot.verticalSlides.setSlides(VerticalSlides.slideStates.intake);
-           }
-           if (gamepad1.dpad_left) {
-               robot.intake();
-               robot.verticalSlides.setSlides(VerticalSlides.slideStates.specimen);
-           }
-           if (gamepad1.dpad_up) {
-               robot.intake();
-               robot.verticalSlides.setSlides(VerticalSlides.slideStates.highRung);
-           }
-           if (gamepad1.dpad_right) {
-               robot.outtake();
-               robot.verticalSlides.setSlides(VerticalSlides.slideStates.highBasket);
-           }
+           switch (currentState){
+               case outtakingBucket:
+                    robot.setClaw(gamepad1);
+                    robot.setArm_Rail(gamepad1, currentState);
 
-           if (gamepad1.left_bumper) robot.claw.moveClaw(Claw.clawStates.open);
-           if (gamepad1.right_bumper) robot.claw.moveClaw(Claw.clawStates.teleopCloseClaw);
+                    switchState = robot.setVerticalSlides(gamepad1);
+                    if (switchState != null) currentState = switchState;
+                    break;
+               case outtakingSpecimen:
+                   robot.setClaw(gamepad1);
+
+                   switchState = robot.setVerticalSlides(gamepad1);
+                   if (switchState != null) currentState = switchState;
+                   break;
+               case intakeSpecimen:
+                   robot.setClaw(gamepad1);
+
+                   switchState = robot.setVerticalSlides(gamepad1);
+                   if (switchState != null) currentState = switchState;
+                   break;
+               case drivingToSubmersible:
+                   robot.setClaw(gamepad1);
+                   robot.setArm_Rail(gamepad1, currentState);
+
+                   switchState = robot.setVerticalSlides(gamepad1);
+                   if (switchState != null) currentState = switchState;
+                   break;
+           }
 
             telemetry.update();
        }
 
-    }
-
-    public Action autoLock(Pose2d currentPose){
-        return drive.actionBuilder(currentPose)
-                .turn(Math.toRadians(90)).build();
     }
 
 }

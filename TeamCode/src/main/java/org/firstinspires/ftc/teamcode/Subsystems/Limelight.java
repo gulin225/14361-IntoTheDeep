@@ -24,10 +24,13 @@ public class Limelight {
     public enum corners{
         blueBucket, blueSpecimen, redBucket, redSpecimen
     }
-    public Limelight(HardwareMap hardwareMap, corners corner){
+    corners corner;
+
+    public Limelight(HardwareMap hardwareMap, corners c){
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
         limelight.start();
+        corner = c;
 
         switch (corner){
             case blueBucket:
@@ -55,14 +58,19 @@ public class Limelight {
             double absoluteBotY = cameraY + relativeBotY;
             Pose2d distanceFromTag = new Pose2d(absoluteBotX, absoluteBotY, Math.toRadians(heading));
 
-            Pose2d botTagPose = new Pose2d(
-                    targetAprilTag.x + distanceFromTag.position.x,
-                    targetAprilTag.y - distanceFromTag.position.y,
-                    heading);
+            Vector2d botPos = new Vector2d(0,0);
+            switch (corner){
+                case blueBucket:
+                    botPos = new Vector2d(
+                            targetAprilTag.x + distanceFromTag.position.x,
+                            targetAprilTag.y - distanceFromTag.position.y);
+                    break;
+            }
+
 
             weightedPose = new Pose2d(
-                    (botTagPose.position.x + pinpointPose.position.x)/2,
-                    (botTagPose.position.y + pinpointPose.position.y)/2,
+                    (botPos.x + pinpointPose.position.x)/2,
+                    (botPos.y + pinpointPose.position.y)/2,
                     heading
             );
         };

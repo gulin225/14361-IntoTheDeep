@@ -20,8 +20,8 @@ public class LinearRail {
                 linkage.setPosition(.23);
                 break;
             case outtake:
-                linearRail.setPosition(.69); //.69
-                linkage.setPosition(.63); //.63
+                linearRail.setPosition(.69);
+                linkage.setPosition(.63);
                 break;
             case middle:
                 linearRail.setPosition(.45);

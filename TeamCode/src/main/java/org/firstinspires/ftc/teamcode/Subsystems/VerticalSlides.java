@@ -100,14 +100,6 @@ public class VerticalSlides {
         }
     }
 
-    public void setSlidesUp(){
-        target = 500;
-    }
-
-    public void setSlidesDown(){
-        target = 0;
-    }
-
     public void setSlides(slideStates state){
         switch (state){
             case intake:
@@ -144,17 +136,4 @@ public class VerticalSlides {
         backRightSlidePID.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         backRightSlidePID.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
-
-    public int getTarget(){
-        return target;
-    }
-    public int getCurrent(){
-        return backRightSlidePID.getCurrentPosition();
-    }
-
-    public void testBackLeft(){
-        backLeftSlide.setPower(.5);
-    }
-
-
 }
