@@ -50,9 +50,12 @@ public class PinpointDrive extends MecanumDrive {
         pinpoint.update();
         pose = pinpoint.getPositionRR();
 
+        if (pose.position.y > 30 && lastPinpointPose.position.y <= 30) limelight.zoomIn();
+
         double heading = pose.heading.toDouble();
         Pose2d aprilTagPose = limelight.getLatestPosition(Math.toDegrees(heading), pose);
         if (aprilTagPose != null) pose = aprilTagPose;
+
 
         lastPinpointPose = pose;
 

@@ -25,7 +25,7 @@ public class BlueSpecimen extends LinearOpMode {
     public static class Poses{
         Pose2d start = new Pose2d(8.5,8, Math.toRadians(0));
         Pose2d preload = new Pose2d(36,18,Math.toRadians(0));
-        Pose2d cycleSampleBucket = new Pose2d(25,-34,Math.toRadians(-20));
+        Pose2d cycleSampleBucket = new Pose2d(25,-34,Math.toRadians(30));
         Pose2d intakeSpecimen = new Pose2d(13, -22, Math.toRadians(0));
         Pose2d placeSpecimen1 = new Pose2d(36,14,Math.toRadians(0));
     }
@@ -94,8 +94,11 @@ public class BlueSpecimen extends LinearOpMode {
                     new SleepAction(.5)
                 )
             ),
-            new SequentialAction(
-                new SleepAction(.5)
+            new ParallelAction(
+                    func.Turn(poses.cycleSampleBucket, 45, 30),
+                    new SequentialAction(
+                            new SleepAction(.5)
+                    )
             )
         );
     }
@@ -103,12 +106,13 @@ public class BlueSpecimen extends LinearOpMode {
     public SequentialAction sample2(){
         return new SequentialAction(
             new ParallelAction(
-                func.Turn(poses.cycleSampleBucket, 0, 20),
+                func.Turn(poses.cycleSampleBucket, 0, 45),
                 new SequentialAction(
                     new SleepAction(.5)
                 )
             ),
             new SequentialAction(
+                func.Turn(poses.cycleSampleBucket, 45, 0),
                 new SleepAction(.5)
             )
         );
@@ -117,12 +121,13 @@ public class BlueSpecimen extends LinearOpMode {
     public SequentialAction sample3(){
         return new SequentialAction(
                 new ParallelAction(
-                    func.Turn(poses.cycleSampleBucket, -20, 0),
+                    func.Turn(poses.cycleSampleBucket, -20, 45),
                     new SequentialAction(
                         new SleepAction(.5)
                     )
                 ),
                 new SequentialAction(
+                    func.Turn(poses.cycleSampleBucket, 45, -20),
                     new SleepAction(.5)
                 )
         );
@@ -131,7 +136,7 @@ public class BlueSpecimen extends LinearOpMode {
         return new SequentialAction(
                 new ParallelAction(
                     func.SingleSpline(
-                        new Pose2d(poses.cycleSampleBucket.position.x, poses.cycleSampleBucket.position.y, Math.toRadians(-20)),
+                        new Pose2d(poses.cycleSampleBucket.position.x, poses.cycleSampleBucket.position.y, Math.toRadians(45)),
                         poses.intakeSpecimen, 180, 180),
                     new SequentialAction(
                         new SleepAction(.5)
