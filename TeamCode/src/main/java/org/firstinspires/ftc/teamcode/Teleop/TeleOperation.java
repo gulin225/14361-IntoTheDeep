@@ -20,7 +20,6 @@ public class TeleOperation extends LinearOpMode {
     Robot robot;
     private GamepadEx driver, controller;
     PinpointDrive drive;
-    Pose2d start = new Pose2d(0,0,0);
     public enum states{
         outtakingSpecimen, outtakingBucket, drivingToSubmersible, intaking, intakeSpecimen
     }
@@ -29,7 +28,6 @@ public class TeleOperation extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-       drive = new PinpointDrive(hardwareMap, start);
        robot = new Robot(hardwareMap, telemetry);
        driver = new GamepadEx(gamepad2);
        controller = new GamepadEx(gamepad1);

@@ -1,5 +1,5 @@
 
-package org.firstinspires.ftc.teamcode.Autonomous.AutoExecutable;
+package org.firstinspires.ftc.teamcode.Autonomous.AutoExecutable.paths;
 
 import static org.firstinspires.ftc.teamcode.Autonomous.AutoExecutable.AutoStates.*;
 
@@ -10,16 +10,17 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.Autonomous.AutoExecutable.AutoStates;
+import org.firstinspires.ftc.teamcode.Autonomous.AutoExecutable.Functions;
 import org.firstinspires.ftc.teamcode.Autonomous.RRdrives.PinpointDrive;
 import org.firstinspires.ftc.teamcode.Autonomous.SubsystemActions.BotActions;
-import org.firstinspires.ftc.teamcode.Subsystems.LinearRail;
+import org.firstinspires.ftc.teamcode.Subsystems.Limelight;
 
 @Config
-@Autonomous(name = "Bucket", group = "Autonomous")
+@Autonomous(name = "Blue Bucket", group = "Autonomous")
 public class BlueBucket extends LinearOpMode {
     public static class Poses{
         Pose2d start = new Pose2d(8.5,-7.8, Math.toRadians(0));
@@ -39,7 +40,7 @@ public class BlueBucket extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        drive = new PinpointDrive(hardwareMap, poses.start);
+        drive = new PinpointDrive(hardwareMap, poses.start, Limelight.corners.blueBucket);
         botActions = new BotActions(hardwareMap);
         func = new Functions(drive, telemetry);
 
@@ -86,7 +87,7 @@ public class BlueBucket extends LinearOpMode {
     public SequentialAction sample1(){
         return new SequentialAction(
             new ParallelAction(
-                func.SingleSpline(poses.preload, poses.cycleSampleBucket, 190, 0),
+                func.SingleSpline(poses.preload, poses.cycleSampleBucket, 260, 0),
                     new SequentialAction(
                         new SleepAction(.5)
                     )

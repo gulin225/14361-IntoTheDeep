@@ -1,21 +1,13 @@
 package org.firstinspires.ftc.teamcode.Autonomous.RRdrives;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.FlightRecorder;
 import com.acmerobotics.roadrunner.ftc.GoBildaPinpointDriver;
 import com.acmerobotics.roadrunner.ftc.GoBildaPinpointDriverRR;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
-import org.firstinspires.ftc.teamcode.Autonomous.AutoExecutable.BlueBucket;
-import org.firstinspires.ftc.teamcode.Autonomous.RRdrives.MecanumDrive;
-import org.firstinspires.ftc.teamcode.Autonomous.messages.PoseMessage;
 import org.firstinspires.ftc.teamcode.Subsystems.Limelight;
 
 public class PinpointDrive extends MecanumDrive {
@@ -31,8 +23,7 @@ public class PinpointDrive extends MecanumDrive {
     public GoBildaPinpointDriverRR pinpoint;
     private Pose2d lastPinpointPose = pose;
     Limelight limelight;
-
-    public PinpointDrive(HardwareMap hardwareMap, Pose2d pose) {
+    public PinpointDrive(HardwareMap hardwareMap, Pose2d pose, Limelight.corners corner) {
         super(hardwareMap, pose);
         leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -48,7 +39,7 @@ public class PinpointDrive extends MecanumDrive {
             throw new RuntimeException(e);
         }
         pinpoint.setPosition(pose);
-        limelight = new Limelight(hardwareMap, Limelight.corners.blueBucket);
+        limelight = new Limelight(hardwareMap, corner);
     }
 
     @Override

@@ -1,26 +1,29 @@
 package org.firstinspires.ftc.teamcode.Autonomous.AutoExecutable;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.Autonomous.RRstuff.Drawing;
 import org.firstinspires.ftc.teamcode.Autonomous.RRdrives.PinpointDrive;
+import org.firstinspires.ftc.teamcode.Subsystems.Limelight;
 
-public class LocalizationTest extends LinearOpMode {
+
+@Config
+@Autonomous(name = "localization", group = "Autonomous")
+public class localization extends LinearOpMode {
+    PinpointDrive drive;
+    Pose2d start = new Pose2d(0,0,0);
+
     @Override
     public void runOpMode() throws InterruptedException {
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-
-        PinpointDrive drive = new PinpointDrive(hardwareMap, new Pose2d(0, 0, 0));
+        drive = new PinpointDrive(hardwareMap, start, Limelight.corners.blueSpecimen);
 
         waitForStart();
 
-        while (opModeIsActive()) {
+        while (opModeIsActive() && !isStopRequested()){
             drive.setDrivePowers(new PoseVelocity2d(
                     new Vector2d(
                             -gamepad1.left_stick_y,
@@ -30,16 +33,12 @@ public class LocalizationTest extends LinearOpMode {
             ));
 
             drive.updatePoseEstimate();
-
             telemetry.addData("x", drive.pose.position.x);
             telemetry.addData("y", drive.pose.position.y);
-            telemetry.addData("heading (deg)", Math.toDegrees(drive.pose.heading.toDouble()));
+            telemetry.addData("H", Math.toDegrees(drive.pose.heading.toDouble()));
             telemetry.update();
-
-            TelemetryPacket packet = new TelemetryPacket();
-            packet.fieldOverlay().setStroke("#3F51B5");
-            Drawing.drawRobot(packet.fieldOverlay(), drive.pose);
-            FtcDashboard.getInstance().sendTelemetryPacket(packet);
         }
+
     }
+
 }
