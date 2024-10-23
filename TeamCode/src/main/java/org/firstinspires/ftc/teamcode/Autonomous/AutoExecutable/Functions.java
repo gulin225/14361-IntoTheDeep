@@ -29,4 +29,5 @@ public class Functions {
             .splineToLinearHeading(end, Math.toRadians(endTangent))
             .build();
   }
+
 }

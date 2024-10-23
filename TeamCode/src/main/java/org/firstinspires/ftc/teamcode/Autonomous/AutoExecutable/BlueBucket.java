@@ -40,14 +40,14 @@ public class BlueBucket extends LinearOpMode {
         linearRail = new LinearRail(hardwareMap);
         func = new Functions(drive, telemetry);
 
-        botActions.init();
+        //botActions.init();
 
         waitForStart();
 
         path = createPath();
 
         while (!isStopRequested() && opModeIsActive()) {
-            verticalSlidePID = botActions.slideActions.PID();
+            //verticalSlidePID = botActions.slideActions.PID();
 
             switch (autoStates){
                 case followingPath:
@@ -58,7 +58,7 @@ public class BlueBucket extends LinearOpMode {
                     break;
             }
 
-            verticalSlidePID.run(tel);
+            //verticalSlidePID.run(tel);
             func.updateTelemetry(autoStates);
         }
     }
@@ -71,12 +71,12 @@ public class BlueBucket extends LinearOpMode {
 
     public SequentialAction preloadSpecimen(){
         return new SequentialAction(
-            botActions.start(),
-            func.createSingleSpline(drive.pose, P2D(27.5, -10, 0), 0, 0),
+            //botActions.start(),
+            func.createSingleSpline(startPose, P2D(27.5, -10, 0), 0, 0),
             new SleepAction(.5),
-            botActions.placeSpecimen(),
-            new SleepAction(.7),
-            botActions.clawActions.openClawAction()
+            //botActions.placeSpecimen(),
+            new SleepAction(.7)
+            //botActions.clawActions.openClawAction()
         );
     }
 
@@ -84,24 +84,24 @@ public class BlueBucket extends LinearOpMode {
         return new SequentialAction(
             new ParallelAction(
                 new SequentialAction(
-                    new SleepAction(.5),
-                    botActions.intake()
+                    new SleepAction(.5)
+                    //botActions.intake()
                 ),
                 func.createSingleSpline(P2D(27.5,-10,0), P2D(18,33,0), 180, 0)
             ),
-            botActions.clampSample(),
+            //botActions.clampSample(),
             new ParallelAction(
-                    func.createSingleSpline(P2D(18,33,0), P2D(13,34,-45), 0, 0),
-                    botActions.outtakeHighBasket()
+                    func.createSingleSpline(P2D(18,33,0), P2D(13,34,-45), 0, 0)
+                    //botActions.outtakeHighBasket()
             ),
             new SleepAction(.3),
             func.createSingleSpline(P2D(13,34,-45), P2D(4,43,-45), 180, 180),
-            botActions.clawActions.openClawAction(),
+            //botActions.clawActions.openClawAction(),
             new SleepAction(.3),
             func.createSingleSpline(P2D(4, 43, -45), P2D(10, 46, 0), 0, 0),
-            botActions.slideActions.intakeAction(),
+            //botActions.slideActions.intakeAction(),
             new SleepAction(.7),
-            botActions.intake(),
+            //botActions.intake(),
             new SleepAction(.5)
         );
     }
@@ -109,19 +109,19 @@ public class BlueBucket extends LinearOpMode {
     public SequentialAction sample2(){
         return new SequentialAction(
                 func.createSingleSpline(P2D(10,46,0), P2D(15,46,0),0,0),
-            botActions.clampSample(),
+            //botActions.clampSample(),
             new ParallelAction(
-                    func.createSingleSpline(P2D(15, 46, 0), P2D(12,32,-45), 0, 0),
-                    botActions.outtakeHighBasket()
+                    func.createSingleSpline(P2D(15, 46, 0), P2D(12,32,-45), 0, 0)
+                    //botActions.outtakeHighBasket()
             ),
             new SleepAction(.3),
             func.createSingleSpline(P2D(12, 32, -45), P2D(4, 43, -45), 180, 180),
-            botActions.clawActions.openClawAction(),
+            //botActions.clawActions.openClawAction(),
             new SleepAction(.3),
             func.createSingleSpline(P2D(4, 43, -45), P2D(10, 40, 0), 180, 180),
-            botActions.slideActions.intakeAction(),
-            new SleepAction(.7),
-            botActions.intake()
+            //botActions.slideActions.intakeAction(),
+            new SleepAction(.7)
+            //botActions.intake()
         );
     }
 

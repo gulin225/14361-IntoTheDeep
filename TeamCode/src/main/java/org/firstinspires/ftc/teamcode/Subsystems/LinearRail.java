@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.Autonomous.RRdrives.AprilTagDrive;
-
 public class LinearRail {
     Servo linearRail, linkage;
     public enum linearRailStates{
@@ -28,8 +26,6 @@ public class LinearRail {
             case middle:
                 linearRail.setPosition(.45);
                 break;
-            case test:
-                linkage.setPosition(AprilTagDrive.PARAMS.kA);
         }
     }
 }

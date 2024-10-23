@@ -1,10 +1,13 @@
 package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 
+import org.firstinspires.ftc.teamcode.Autonomous.RRdrives.PinpointDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.Claw;
 import org.firstinspires.ftc.teamcode.Subsystems.LinearRail;
 import org.firstinspires.ftc.teamcode.Subsystems.Robot;
@@ -17,12 +20,15 @@ public class TeleOperation extends LinearOpMode {
     Robot robot;
     private GamepadEx driver, controller;
     double total = 0;
+    PinpointDrive drive;
+    Pose2d start = new Pose2d(0,0,0);
 
     @Override
     public void runOpMode() throws InterruptedException {
+       drive = new PinpointDrive(hardwareMap, start);
        robot = new Robot(hardwareMap, telemetry);
-        driver = new GamepadEx(gamepad2);
-        controller = new GamepadEx(gamepad1);
+       driver = new GamepadEx(gamepad2);
+       controller = new GamepadEx(gamepad1);
        waitForStart();
        robot.init();
 
@@ -48,7 +54,6 @@ public class TeleOperation extends LinearOpMode {
            if (gamepad1.circle) robot.outtake();
 
            if (gamepad1.right_trigger > .2) robot.claw.moveClaw(Claw.clawStates.spinOn);
-           else if (gamepad1.left_trigger > .2) robot.claw.moveClaw(Claw.clawStates.spinReverse);
            else  robot.claw.moveClaw(Claw.clawStates.spinOff);
            if(gamepad2.b) {
                 robot.claw.moveClaw(Claw.clawStates.outtake);
@@ -78,4 +83,10 @@ public class TeleOperation extends LinearOpMode {
        }
 
     }
+
+    public Action autoLock(Pose2d currentPose){
+        return drive.actionBuilder(currentPose)
+                .turn(Math.toRadians(90)).build();
+    }
+
 }

@@ -14,13 +14,14 @@ import java.util.List;
 
 public class Limelight {
     public Limelight3A limelight;
-    public Limelight(HardwareMap hardwareMap, Telemetry telemetry){
+    public Limelight(HardwareMap hardwareMap){
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
         limelight.start();
     }
 
-    public Pose3D getLatestPosition(Telemetry telemetry){
+    public Pose3D getLatestPosition(double heading){
+        limelight.updateRobotOrientation(heading);
         LLResult result = limelight.getLatestResult();
         if (!result.getFiducialResults().isEmpty()) return result.getBotpose_MT2();
         return null;

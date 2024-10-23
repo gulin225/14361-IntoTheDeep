@@ -65,9 +65,8 @@ public class PinpointDrive extends MecanumDrive {
     public static Params PARAMS = new Params();
     public GoBildaPinpointDriverRR pinpoint;
     private Pose2d lastPinpointPose = pose;
-    Telemetry telemetry;
-    final double cameraPlacementX = 7.5;
-    final double cameraPlacementY = 0;
+    final double cameraPlacementX = 0;
+    final double cameraPlacementY = 7.4;
     final double cameraAngle = Math.atan(cameraPlacementY/cameraPlacementX);
     final double botCenterHypotenuse = Math.sqrt(Math.pow(cameraPlacementX,2) + Math.pow(cameraPlacementY,2));
     Limelight limelight;
@@ -88,26 +87,7 @@ public class PinpointDrive extends MecanumDrive {
             throw new RuntimeException(e);
         }
         pinpoint.setPosition(pose);
-    }
-    public PinpointDrive(HardwareMap hardwareMap, Pose2d pose, Telemetry tel) {
-        super(hardwareMap, pose);
-
-        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        FlightRecorder.write("PINPOINT_PARAMS",PARAMS);
-        pinpoint = hardwareMap.get(GoBildaPinpointDriverRR.class,"pinpoint");
-        pinpoint.setOffsets(DistanceUnit.MM.fromInches(PARAMS.xOffset), DistanceUnit.MM.fromInches(PARAMS.yOffset));
-        pinpoint.setEncoderResolution(PARAMS.encoderResolution);
-        pinpoint.setEncoderDirections(PARAMS.xDirection, PARAMS.yDirection);
-        pinpoint.resetPosAndIMU();
-        try {
-            Thread.sleep(300);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        telemetry = tel;
-        limelight = new Limelight(hardwareMap, telemetry);
-        pinpoint.setPosition(pose);
+        limelight = new Limelight(hardwareMap);
     }
 
     @Override
@@ -116,16 +96,14 @@ public class PinpointDrive extends MecanumDrive {
             pinpoint.setPosition(pose);
         }
         pinpoint.update();
-
-        /*Pose2d aprilTagPose = updatePoseWithAprilTag(pinpoint.getHeading());
-        if (aprilTagPose != null){
-            double weightedX = (pose.position.x + aprilTagPose.position.x)/2;
-            double weightedY = (pose.position.y + aprilTagPose.position.y)/2;
-            Pose2d weightedPose = new Pose2d(weightedX, weightedY,pose.heading.toDouble());
-            telemetry.addData("apriltag", aprilTagPose.toString());
-        }else telemetry.addLine("tag not in sight");*/
-
         pose = pinpoint.getPositionRR();
+
+        Pose2d aprilTagPose = UpdateAprilTag(Math.toDegrees(pose.heading.toDouble()));
+        if (aprilTagPose != null){
+            pose = aprilTagPose;
+        }
+        else pose = pinpoint.getPositionRR();
+
         lastPinpointPose = pose;
 
         poseHistory.add(pose);
@@ -141,30 +119,21 @@ public class PinpointDrive extends MecanumDrive {
         return pinpoint.getVelocityRR();
     }
 
-    public Pose2d updatePoseWithAprilTag(double heading){
-        limelight.limelight.updateRobotOrientation(heading);
-        Pose3D botpose = limelight.getLatestPosition(telemetry);
+    public Pose2d UpdateAprilTag(double heading) {
+        Pose3D botpose = limelight.getLatestPosition(heading);
 
         Pose2d newPose = null;
-        if (botpose != null){
-            double cameraX = (botpose.getPosition().x-1.8002)/0.04203;
-            double cameraY = ((botpose.getPosition().y*39.37)+ 47.3044)/1.65203;
-
-            //if camera is centered
-            double relativeBotX = Math.cos(Math.toRadians(heading))*cameraPlacementX;
-            double relativeBotY = Math.sin(Math.toRadians(heading))*cameraPlacementX;
+        if (botpose != null) {
+            double cameraY = -((botpose.getPosition().x - 1.8002) / 0.04203)-85;
+            double cameraX = (((botpose.getPosition().y * 39.37) + 47.3044) / 1.65203)-58;
 
             //if camera has y displacement from origin
-            relativeBotX = Math.cos(Math.toRadians(heading) + cameraAngle) * botCenterHypotenuse;
-            relativeBotY = Math.sin(Math.toRadians(heading) + cameraAngle) * botCenterHypotenuse;
+            double relativeBotX = Math.cos(Math.toRadians(heading) + cameraAngle) * botCenterHypotenuse;
+            double relativeBotY = Math.sin(Math.toRadians(heading) + cameraAngle) * botCenterHypotenuse;
 
             double absoluteBotX = cameraX - relativeBotX;
-            double absoluteBotY = cameraY - relativeBotY;
-
-            //double botPosX = targetAprilTag.x + absoluteBotX;
-            //double botPosY = targetAprilTag.y + absoluteBotY;
-
-            newPose = new Pose2d(cameraX, cameraY, heading);
+            double absoluteBotY = cameraY + relativeBotY;
+            newPose = new Pose2d(absoluteBotX, absoluteBotY, Math.toRadians(heading));
         }
         return newPose;
     }
