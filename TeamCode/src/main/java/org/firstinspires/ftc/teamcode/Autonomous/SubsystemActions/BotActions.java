@@ -27,13 +27,17 @@ public class BotActions {
         return new ParallelAction(
             clawActions.closeClawAction(),
             clawActions.wristOn(),
-            clawActions.ArmHighRung()
+            clawActions.ArmHighRung(),
+            slideActions.intakeAction()
         );
     }
     public ParallelAction start(){
         return new ParallelAction(
             slideActions.highRungAction(),
-            linearRailActions.outtakeAction()
+            linearRailActions.outtakeAction(),
+            new SequentialAction(
+
+            )
         );
     }
 

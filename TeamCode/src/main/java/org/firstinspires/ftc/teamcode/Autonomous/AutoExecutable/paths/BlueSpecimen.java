@@ -47,9 +47,9 @@ public class BlueSpecimen extends LinearOpMode {
         func = new Functions(drive, telemetry);
 
         //botActions.init();
+        while (!isStarted()) drive.updatePoseEstimate();
 
-        waitForStart();
-
+        poses.start = drive.pose;
         path = createPath();
 
         while (!isStopRequested() && opModeIsActive()) {
@@ -91,13 +91,13 @@ public class BlueSpecimen extends LinearOpMode {
             new ParallelAction(
                 func.SingleSpline(poses.preload, poses.cycleSampleBucket, 260, 0),
                 new SequentialAction(
-                    new SleepAction(.5)
+                    new SleepAction(1)
                 )
             ),
             new ParallelAction(
                     func.Turn(poses.cycleSampleBucket, 45, 30),
                     new SequentialAction(
-                            new SleepAction(.5)
+                            new SleepAction(1)
                     )
             )
         );
@@ -108,12 +108,12 @@ public class BlueSpecimen extends LinearOpMode {
             new ParallelAction(
                 func.Turn(poses.cycleSampleBucket, 0, 45),
                 new SequentialAction(
-                    new SleepAction(.5)
+                    new SleepAction(1)
                 )
             ),
             new SequentialAction(
                 func.Turn(poses.cycleSampleBucket, 45, 0),
-                new SleepAction(.5)
+                new SleepAction(1)
             )
         );
     }
@@ -123,12 +123,12 @@ public class BlueSpecimen extends LinearOpMode {
                 new ParallelAction(
                     func.Turn(poses.cycleSampleBucket, -20, 45),
                     new SequentialAction(
-                        new SleepAction(.5)
+                        new SleepAction(1)
                     )
                 ),
                 new SequentialAction(
                     func.Turn(poses.cycleSampleBucket, 45, -20),
-                    new SleepAction(.5)
+                    new SleepAction(1)
                 )
         );
     }
@@ -139,13 +139,13 @@ public class BlueSpecimen extends LinearOpMode {
                         new Pose2d(poses.cycleSampleBucket.position.x, poses.cycleSampleBucket.position.y, Math.toRadians(45)),
                         poses.intakeSpecimen, 180, 180),
                     new SequentialAction(
-                        new SleepAction(.5)
+                        new SleepAction(1)
                     )
                 ),
                 new ParallelAction(
                     func.SingleSpline(poses.intakeSpecimen, poses.placeSpecimen1, 0, 0),
                     new SequentialAction(
-                        new SleepAction(.5)
+                        new SleepAction(1)
                     )
                 )
         );

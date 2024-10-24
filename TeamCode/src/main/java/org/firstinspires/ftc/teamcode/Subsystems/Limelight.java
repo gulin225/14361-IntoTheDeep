@@ -71,32 +71,9 @@ public class Limelight {
             double relativeBotY = Math.sin(Math.toRadians(heading) + cameraAngle) * botCenterHypotenuse;
 
             double absoluteBotX = cameraX + relativeBotX;
-            double absoluteBotY = 0;
-            switch (corner){
-                case blueBucket:
-                    absoluteBotY = cameraY + relativeBotY;
-                    break;
-                case blueSpecimen:
-                    absoluteBotY = cameraY + relativeBotY;
-                    break;
-            }
+            double absoluteBotY = cameraY + relativeBotY;
 
-            Pose2d distanceFromTag = new Pose2d(absoluteBotX, absoluteBotY, Math.toRadians(heading));
-
-            Vector2d botPos = new Vector2d(0,0);
-            switch (corner){
-                case blueBucket:
-                    botPos = new Vector2d(
-                            targetAprilTag.x + distanceFromTag.position.x,
-                            targetAprilTag.y - distanceFromTag.position.y);
-                    break;
-                case blueSpecimen:
-                    botPos = new Vector2d(
-                            targetAprilTag.x + distanceFromTag.position.x,
-                            targetAprilTag.y + distanceFromTag.position.y);
-                    break;
-            }
-
+            Vector2d botPos = new Vector2d(targetAprilTag.x + absoluteBotX, targetAprilTag.y + absoluteBotY);
 
             weightedPose = new Pose2d(botPos, Math.toRadians(heading));
         };
