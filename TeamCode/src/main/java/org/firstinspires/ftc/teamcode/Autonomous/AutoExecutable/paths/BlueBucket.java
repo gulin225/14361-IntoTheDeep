@@ -46,7 +46,7 @@ public class BlueBucket extends LinearOpMode {
         botActions = new BotActions(hardwareMap);
         func = new Functions(drive, telemetry);
 
-        botActions.init();
+        //botActions.init();
 
         while (!isStarted()) drive.updatePoseEstimate();
 
@@ -54,7 +54,7 @@ public class BlueBucket extends LinearOpMode {
         path = createPath();
 
         while (!isStopRequested() && opModeIsActive()) {
-            verticalSlidePID = botActions.slideActions.PID();
+            //verticalSlidePID = botActions.slideActions.PID();
 
             switch (autoStates){
                 case followingPath:
@@ -65,14 +65,14 @@ public class BlueBucket extends LinearOpMode {
                     break;
             }
 
-            verticalSlidePID.run(tel);
+            //verticalSlidePID.run(tel);
             func.updateTelemetry(autoStates);
         }
     }
 
     public SequentialAction createPath(){
         return new SequentialAction(
-                preloadSpecimen(), sample1(), sample2(), sample3()
+                preloadSpecimen(), sample1(), sample2(), sample3(), teammateSample1()
         );
     }
 
@@ -81,7 +81,7 @@ public class BlueBucket extends LinearOpMode {
             new ParallelAction(
                 func.SingleSpline(poses.start, poses.preload, 0, 0),
                 new SequentialAction(
-                    botActions.start(),
+                    //botActions.start(),
                     new SleepAction(1)
                 )
             )
@@ -110,7 +110,7 @@ public class BlueBucket extends LinearOpMode {
             new ParallelAction(
                 func.Turn(poses.cycleSampleBucket, 0, -45),
                 new SequentialAction(
-                        new SleepAction(1)
+                        new SleepAction(1.5)
                 )
             ),
             new ParallelAction(
@@ -127,7 +127,7 @@ public class BlueBucket extends LinearOpMode {
             new ParallelAction(
                 func.Turn(poses.cycleSampleBucket, -45, 20),
                 new SequentialAction(
-                        new SleepAction(1)
+                        new SleepAction(2)
                 )
             ),
             new ParallelAction(

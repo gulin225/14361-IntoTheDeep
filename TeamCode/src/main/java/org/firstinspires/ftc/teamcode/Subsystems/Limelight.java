@@ -40,10 +40,10 @@ public class Limelight {
 
         switch (corner){
             case blueBucket:
-                targetAprilTag = new Vector2d(20,40);
+                targetAprilTag = new Vector2d(23,47.5);
                 break;
             case blueSpecimen:
-                targetAprilTag = new Vector2d(23.5,-47.5);
+                targetAprilTag = new Vector2d(23,-47.5);
                 break;
         }
     }
@@ -60,14 +60,31 @@ public class Limelight {
             Pose3D rawPose = result.getBotpose_MT2();
 
             double cameraX = 0, cameraY = 0;
+
             switch (zoom){
                 case close:
-                    cameraY = -((rawPose.getPosition().x - 1.8002) / 0.04203)-85;
-                    cameraX = (((rawPose.getPosition().y * 39.37) + 47.3044) / 1.65203)-58;
+                    switch (corner){
+                        case blueSpecimen:
+                            cameraY = -((rawPose.getPosition().x - 1.8002) / 0.04203)-85;
+                            cameraX = (((rawPose.getPosition().y * 39.37) + 47.3044) / 1.65203)-58;
+                            break;
+                        case blueBucket:
+                            cameraY = -((rawPose.getPosition().x - 1.8002) / 0.04203)+.5;
+                            cameraX = -(((rawPose.getPosition().y * 39.37) + 47.3044) / 1.65203)+57.5;
+                            break;
+                    }
                     break;
                 case far:
-                    cameraY = (rawPose.getPosition().y*39.37)*-1.99415 + 87.7902;
-                    cameraX = (rawPose.getPosition().x*39.37)*-1.96417-135.804;
+                    switch(corner){
+                        case blueSpecimen:
+                            cameraY = (rawPose.getPosition().y*39.37)*-1.99415 + 87.7902;
+                            cameraX = (rawPose.getPosition().x*39.37)*-1.96417-135.804;
+                            break;
+                        case blueBucket:
+                            cameraY = (rawPose.getPosition().y*39.37)*-1.99415 + 84.8;
+                            cameraX = -(rawPose.getPosition().x*39.37)*-1.96417-135.804;
+                            break;
+                    }
                     break;
             }
 
@@ -77,19 +94,34 @@ public class Limelight {
             double absoluteBotX = cameraX + relativeBotX;
             double absoluteBotY = cameraY + relativeBotY;
 
-            Vector2d botPos = new Vector2d(targetAprilTag.x + absoluteBotX, targetAprilTag.y + absoluteBotY);
+            Vector2d botPos = new Vector2d(0,0);
+            switch (corner){
+                case blueSpecimen:
+                    botPos = new Vector2d(targetAprilTag.x + absoluteBotX, targetAprilTag.y + absoluteBotY);
+                    break;
+                case blueBucket:
+                    botPos = new Vector2d(targetAprilTag.x + absoluteBotX, targetAprilTag.y - absoluteBotY);
+                    break;
+            }
 
             weightedPose = new Pose2d(botPos, Math.toRadians(heading));
+            telemetry.addLine(weightedPose.position.toString());
+            telemetry.addData("rel x", relativeBotX);
+            telemetry.addData("rel y", relativeBotY);
+            telemetry.addData("Cam x", cameraX);
+            telemetry.addData("Cam y", cameraY);
+            telemetry.addData("zoom", zoom);
+            telemetry.addData("corner", corner);
         };
         return weightedPose;
     }
 
     public void zoomIn(){
-        limelight.pipelineSwitch(0);
-        zoom = cameraModes.close;
-    }
-    public void zoomOut(){
         limelight.pipelineSwitch(1);
         zoom = cameraModes.far;
+    }
+    public void zoomOut(){
+        limelight.pipelineSwitch(0);
+        zoom = cameraModes.close;
     }
 }

@@ -71,7 +71,7 @@ public class BlueSpecimen extends LinearOpMode {
 
     public SequentialAction createPath(){
         return new SequentialAction(
-            preloadSpecimen(), sample1()
+            preloadSpecimen(), sample1(), sample2(), sample3(), specimen1()
         );
     }
 
