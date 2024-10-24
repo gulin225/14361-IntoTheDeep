@@ -10,6 +10,7 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -24,8 +25,9 @@ import org.firstinspires.ftc.teamcode.Subsystems.Limelight;
 public class BlueBucket extends LinearOpMode {
     public static class Poses{
         Pose2d start = new Pose2d(8.5,-7.8, Math.toRadians(0));
-        Pose2d preload = new Pose2d(36,-18,Math.toRadians(0));
-        Pose2d cycleSampleBucket = new Pose2d(25,34,Math.toRadians(-20));
+        Pose2d preload = new Pose2d(32,-18,Math.toRadians(0));
+        Pose2d cycleSampleBucket = new Pose2d(25,34,Math.toRadians(-30));
+        //Pose2d cycleTeammateSamples = new Pose2d()
     }
 
     AutoStates autoStates = followingPath;
@@ -44,14 +46,15 @@ public class BlueBucket extends LinearOpMode {
         botActions = new BotActions(hardwareMap);
         func = new Functions(drive, telemetry);
 
-        //botActions.init();
+        botActions.init();
 
-        waitForStart();
+        while (!isStarted()) drive.updatePoseEstimate();
 
+        poses.start = drive.pose;
         path = createPath();
 
         while (!isStopRequested() && opModeIsActive()) {
-            //verticalSlidePID = botActions.slideActions.PID();
+            verticalSlidePID = botActions.slideActions.PID();
 
             switch (autoStates){
                 case followingPath:
@@ -62,7 +65,7 @@ public class BlueBucket extends LinearOpMode {
                     break;
             }
 
-            //verticalSlidePID.run(tel);
+            verticalSlidePID.run(tel);
             func.updateTelemetry(autoStates);
         }
     }
@@ -78,7 +81,8 @@ public class BlueBucket extends LinearOpMode {
             new ParallelAction(
                 func.SingleSpline(poses.start, poses.preload, 0, 0),
                 new SequentialAction(
-                        new SleepAction(.5)
+                    botActions.start(),
+                    new SleepAction(1)
                 )
             )
         );
@@ -89,13 +93,13 @@ public class BlueBucket extends LinearOpMode {
             new ParallelAction(
                 func.SingleSpline(poses.preload, poses.cycleSampleBucket, 260, 0),
                     new SequentialAction(
-                        new SleepAction(.5)
+                        new SleepAction(1)
                     )
             ),
             new ParallelAction(
-                func.Turn(poses.cycleSampleBucket, -45, 0),
+                func.Turn(poses.cycleSampleBucket, -45, -30),
                 new SequentialAction(
-                    new SleepAction(.5)
+                    new SleepAction(1)
                 )
             )
         );
@@ -106,13 +110,13 @@ public class BlueBucket extends LinearOpMode {
             new ParallelAction(
                 func.Turn(poses.cycleSampleBucket, 0, -45),
                 new SequentialAction(
-                        new SleepAction(.5)
+                        new SleepAction(1)
                 )
             ),
             new ParallelAction(
                 func.Turn(poses.cycleSampleBucket, -45, 0),
                 new SequentialAction(
-                        new SleepAction(.5)
+                        new SleepAction(1)
                 )
             )
         );
@@ -123,21 +127,32 @@ public class BlueBucket extends LinearOpMode {
             new ParallelAction(
                 func.Turn(poses.cycleSampleBucket, -45, 20),
                 new SequentialAction(
-                        new SleepAction(.5)
+                        new SleepAction(1)
                 )
             ),
             new ParallelAction(
                 func.Turn(poses.cycleSampleBucket, -45, 20),
                 new SequentialAction(
-                        new SleepAction(.5)
+                        new SleepAction(1)
                 )
             )
         );
     }
 
-    public Pose2d P2D(double x, double y, double angle) {
-        //Shorter Pose2d
-        return new Pose2d(x,y,Math.toRadians(angle));
+    public SequentialAction teammateSample1(){
+        return new SequentialAction(
+            new ParallelAction(drive.actionBuilder(
+                    new Pose2d(poses.cycleSampleBucket.position, Math.toRadians(-45)))
+                       .setTangent(Math.toRadians(290))
+                       .splineToSplineHeading(new Pose2d(30,-20,Math.toRadians(-20)), Math.toRadians(270))
+                       .splineToConstantHeading(new Vector2d(15, -60), Math.toRadians(270))
+                       .splineToConstantHeading(new Vector2d(25,-82), Math.toRadians(330)).build(),
+                new SequentialAction(
+                    new SleepAction(1)
+
+                )
+            )
+        );
     }
 }
 
