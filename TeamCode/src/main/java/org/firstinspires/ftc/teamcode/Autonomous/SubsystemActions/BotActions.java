@@ -1,19 +1,28 @@
 package org.firstinspires.ftc.teamcode.Autonomous.SubsystemActions;
 
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.Autonomous.RRdrives.PinpointDrive;
+import org.firstinspires.ftc.teamcode.Subsystems.Claw;
+
 public class BotActions {
     public ClawActions clawActions;
     public LinearRailActions linearRailActions;
     public SlideActions slideActions;
+    public PinpointDrive drive;
 
-    public BotActions(HardwareMap hardwareMap){
+    public BotActions(HardwareMap hardwareMap, PinpointDrive pdrive){
         clawActions = new ClawActions(hardwareMap);
         linearRailActions = new LinearRailActions(hardwareMap);
         slideActions = new SlideActions(hardwareMap);
+        drive = pdrive;
     }
 
     public ParallelAction outtakeHighRung(){
@@ -70,6 +79,23 @@ public class BotActions {
             new SleepAction(.3),
             clawActions.spinOffAction()
         );
+    }
+
+    public class zoomIn implements Action {
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                drive.limelight.zoomIn();
+                initialized = true;
+            }
+            return false;
+        }
+    }
+
+    public Action zoomInAction(){
+        return new zoomIn();
     }
 
 }

@@ -42,6 +42,9 @@ public class Limelight {
             case blueBucket:
                 targetAprilTag = new Vector2d(23,47.5);
                 break;
+            case redBucket:
+                targetAprilTag = new Vector2d(23,47.5);
+                break;
             case blueSpecimen:
                 targetAprilTag = new Vector2d(23,-47.5);
                 break;
@@ -72,6 +75,10 @@ public class Limelight {
                             cameraY = -((rawPose.getPosition().x - 1.8002) / 0.04203)+.5;
                             cameraX = -(((rawPose.getPosition().y * 39.37) + 47.3044) / 1.65203)+57.5;
                             break;
+                        case redBucket:
+                            cameraY = -((rawPose.getPosition().x - 1.8002) / 0.04203)+-85.5;
+                            cameraX = -(((rawPose.getPosition().y * 39.37) + 47.3044) / 1.65203);
+                            break;
                     }
                     break;
                 case far:
@@ -83,6 +90,10 @@ public class Limelight {
                         case blueBucket:
                             cameraY = (rawPose.getPosition().y*39.37)*-1.99415 + 84.8;
                             cameraX = -(rawPose.getPosition().x*39.37)*-1.96417-135.804;
+                            break;
+                        case redBucket:
+                            cameraY = (rawPose.getPosition().y*39.37)*-2.15176-122.776;
+                            cameraX = -(rawPose.getPosition().x*39.37)*2.09-151.24;
                             break;
                     }
                     break;
@@ -100,6 +111,9 @@ public class Limelight {
                     botPos = new Vector2d(targetAprilTag.x + absoluteBotX, targetAprilTag.y + absoluteBotY);
                     break;
                 case blueBucket:
+                    botPos = new Vector2d(targetAprilTag.x + absoluteBotX, targetAprilTag.y - absoluteBotY);
+                    break;
+                case redBucket:
                     botPos = new Vector2d(targetAprilTag.x + absoluteBotX, targetAprilTag.y - absoluteBotY);
                     break;
             }

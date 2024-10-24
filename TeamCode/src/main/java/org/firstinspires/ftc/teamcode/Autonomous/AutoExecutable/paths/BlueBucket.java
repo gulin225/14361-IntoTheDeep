@@ -27,6 +27,7 @@ public class BlueBucket extends LinearOpMode {
         Pose2d start = new Pose2d(8.5,-7.8, Math.toRadians(0));
         Pose2d preload = new Pose2d(32,-18,Math.toRadians(0));
         Pose2d cycleSampleBucket = new Pose2d(25,34,Math.toRadians(-30));
+        Pose2d zoomIn = new Pose2d(15, -60, Math.toRadians(0));
         //Pose2d cycleTeammateSamples = new Pose2d()
     }
 
@@ -43,7 +44,7 @@ public class BlueBucket extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         drive = new PinpointDrive(hardwareMap, poses.start, Limelight.corners.blueBucket, telemetry);
-        botActions = new BotActions(hardwareMap);
+        botActions = new BotActions(hardwareMap, drive);
         func = new Functions(drive, telemetry);
 
         //botActions.init();
@@ -99,7 +100,7 @@ public class BlueBucket extends LinearOpMode {
             new ParallelAction(
                 func.Turn(poses.cycleSampleBucket, -45, -30),
                 new SequentialAction(
-                    new SleepAction(1)
+                    new SleepAction(1.75)
                 )
             )
         );
@@ -116,7 +117,7 @@ public class BlueBucket extends LinearOpMode {
             new ParallelAction(
                 func.Turn(poses.cycleSampleBucket, -45, 0),
                 new SequentialAction(
-                        new SleepAction(1)
+                        new SleepAction(1.75)
                 )
             )
         );
@@ -125,15 +126,15 @@ public class BlueBucket extends LinearOpMode {
     public SequentialAction sample3(){
         return new SequentialAction(
             new ParallelAction(
-                func.Turn(poses.cycleSampleBucket, -45, 20),
+                func.Turn(poses.cycleSampleBucket, 30, -45),
                 new SequentialAction(
                         new SleepAction(2)
                 )
             ),
             new ParallelAction(
-                func.Turn(poses.cycleSampleBucket, -45, 20),
+                func.Turn(poses.cycleSampleBucket, -45, 30),
                 new SequentialAction(
-                        new SleepAction(1)
+                        new SleepAction(1.75)
                 )
             )
         );
@@ -144,14 +145,21 @@ public class BlueBucket extends LinearOpMode {
             new ParallelAction(drive.actionBuilder(
                     new Pose2d(poses.cycleSampleBucket.position, Math.toRadians(-45)))
                        .setTangent(Math.toRadians(290))
-                       .splineToSplineHeading(new Pose2d(30,-20,Math.toRadians(-20)), Math.toRadians(270))
-                       .splineToConstantHeading(new Vector2d(15, -60), Math.toRadians(270))
-                       .splineToConstantHeading(new Vector2d(25,-82), Math.toRadians(330)).build(),
+                       .splineToSplineHeading(new Pose2d(25,-20,Math.toRadians(0)), Math.toRadians(270))
+                       .splineToSplineHeading(poses.zoomIn, Math.toRadians(240)).build(),
+            new SequentialAction(
+                new SleepAction(1)
+            )
+        ),
+        new SequentialAction(
+            botActions.zoomInAction(),
+            new ParallelAction(
+                func.SingleSpline(poses.zoomIn, new Pose2d(25,-82, Math.toRadians(0)),250,0),
                 new SequentialAction(
                     new SleepAction(1)
-
                 )
             )
+        )
         );
     }
 }

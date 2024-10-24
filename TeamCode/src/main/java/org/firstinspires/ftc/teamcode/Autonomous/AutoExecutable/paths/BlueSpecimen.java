@@ -43,7 +43,7 @@ public class BlueSpecimen extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         drive = new PinpointDrive(hardwareMap, poses.start, Limelight.corners.blueSpecimen, telemetry);
-        botActions = new BotActions(hardwareMap);
+        botActions = new BotActions(hardwareMap, drive);
         func = new Functions(drive, telemetry);
 
         //botActions.init();
@@ -97,7 +97,7 @@ public class BlueSpecimen extends LinearOpMode {
             new ParallelAction(
                     func.Turn(poses.cycleSampleBucket, 45, 30),
                     new SequentialAction(
-                            new SleepAction(1)
+                            new SleepAction(1.75)
                     )
             )
         );
@@ -113,7 +113,7 @@ public class BlueSpecimen extends LinearOpMode {
             ),
             new SequentialAction(
                 func.Turn(poses.cycleSampleBucket, 45, 0),
-                new SleepAction(1)
+                new SleepAction(1.75)
             )
         );
     }
@@ -128,7 +128,7 @@ public class BlueSpecimen extends LinearOpMode {
                 ),
                 new SequentialAction(
                     func.Turn(poses.cycleSampleBucket, 45, -20),
-                    new SleepAction(1)
+                    new SleepAction(1.75)
                 )
         );
     }
@@ -145,6 +145,7 @@ public class BlueSpecimen extends LinearOpMode {
                 new ParallelAction(
                     func.SingleSpline(poses.intakeSpecimen, poses.placeSpecimen1, 0, 0),
                     new SequentialAction(
+                        botActions.zoomInAction(),
                         new SleepAction(1)
                     )
                 )

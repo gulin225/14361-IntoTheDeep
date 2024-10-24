@@ -19,7 +19,8 @@ public class localization extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        drive = new PinpointDrive(hardwareMap, start, Limelight.corners.blueBucket, telemetry);
+        drive = new PinpointDrive(hardwareMap, start, Limelight.corners.redBucket, telemetry);
+        drive.limelight.zoomIn();
         waitForStart();
 
         while (opModeIsActive() && !isStopRequested()){
