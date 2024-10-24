@@ -40,7 +40,7 @@ public class BlueBucket extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        drive = new PinpointDrive(hardwareMap, poses.start, Limelight.corners.blueBucket);
+        drive = new PinpointDrive(hardwareMap, poses.start, Limelight.corners.blueBucket, telemetry);
         botActions = new BotActions(hardwareMap);
         func = new Functions(drive, telemetry);
 

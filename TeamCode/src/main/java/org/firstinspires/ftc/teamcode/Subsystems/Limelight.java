@@ -29,12 +29,14 @@ public class Limelight {
     }
     public corners corner;
     public cameraModes zoom = cameraModes.close;
+    Telemetry telemetry;
 
-    public Limelight(HardwareMap hardwareMap, corners c){
+    public Limelight(HardwareMap hardwareMap, corners c, Telemetry tel){
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
         limelight.start();
         corner = c;
+        telemetry = tel;
 
         switch (corner){
             case blueBucket:
@@ -47,6 +49,8 @@ public class Limelight {
     }
 
     public Pose2d getLatestPosition(double heading, Pose2d pinpointPose){
+        telemetry.addData("Zoom", corner);
+        telemetry.addLine("April Tag Detected");
         Pose2d weightedPose = null;
 
         limelight.updateRobotOrientation(heading);

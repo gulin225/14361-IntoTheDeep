@@ -42,7 +42,7 @@ public class BlueSpecimen extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        drive = new PinpointDrive(hardwareMap, poses.start, Limelight.corners.blueSpecimen);
+        drive = new PinpointDrive(hardwareMap, poses.start, Limelight.corners.blueSpecimen, telemetry);
         botActions = new BotActions(hardwareMap);
         func = new Functions(drive, telemetry);
 

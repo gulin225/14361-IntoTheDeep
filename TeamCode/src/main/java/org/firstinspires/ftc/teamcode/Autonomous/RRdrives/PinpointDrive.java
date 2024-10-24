@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.ftc.GoBildaPinpointDriverRR;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Subsystems.Limelight;
 
@@ -23,7 +24,9 @@ public class PinpointDrive extends MecanumDrive {
     public GoBildaPinpointDriverRR pinpoint;
     private Pose2d lastPinpointPose = pose;
     public Limelight limelight;
-    public PinpointDrive(HardwareMap hardwareMap, Pose2d pose, Limelight.corners corner) {
+    Telemetry telemetry;
+
+    public PinpointDrive(HardwareMap hardwareMap, Pose2d pose, Limelight.corners corner, Telemetry tel) {
         super(hardwareMap, pose);
         leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -39,7 +42,8 @@ public class PinpointDrive extends MecanumDrive {
             throw new RuntimeException(e);
         }
         pinpoint.setPosition(pose);
-        limelight = new Limelight(hardwareMap, corner);
+        limelight = new Limelight(hardwareMap, corner, tel);
+        telemetry = tel;
     }
 
     @Override
